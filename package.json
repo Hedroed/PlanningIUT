@@ -13,6 +13,7 @@
     "express": "~4.14.0",
     "morgan": "~1.7.0",
     "node-sass-middleware": "0.9.8",
-    "serve-favicon": "~2.3.0"
+    "serve-favicon": "~2.3.0",
+    "xmlreader": "^0.2.3"
   }
 }
