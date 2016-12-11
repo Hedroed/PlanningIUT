@@ -4,4 +4,9 @@ var obj = new Planning("8241fc38732002141317a107b7ce989cd1bb95aa76bef7d8013f8ecf
 //var obj = new Planning("8241fc387320021460d62b880601db3b64f024f9f358aca3f8c622193b252c7c70ca02662d77329d659f71eb5a546079ab0d0ef21be75acf7c140d03600301e2f68b608172d7a40a23f88ba273aab1d0acd7b24671b1194634ae47158ec67a871331a2981729d29a504cdf3c1acef8543cfd5b81b930e6b64fdfbb1046e3de9bbcfeea78fed0a8b4");
 
 
-obj.updatePlanning();
+obj.updatePlanning(()=>{
+    console.log(obj.data.courses.length);
+    console.log(obj.data.courses[0]);
+
+    console.log(obj.getCourses(["2C1","2C","2"]));
+});

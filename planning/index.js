@@ -1,33 +1,61 @@
 var updater = require('./updater');
 
-
 var Planning = function (id) {
     this.idPlanning = id;
+    this.data = null;
 }
 
-Planning.prototype.updatePlanning = function () {
-    updater.getCalendar(this.idPlanning, function (e) {
-        // console.log(e.courses[162]);
-        // console.log(e.courses[163]);
-        // console.log(e.courses[164]);
-        // console.log(e.courses[165]);
+Planning.prototype.updatePlanning = function (callback) {
+    var me = this;
 
-        var i=0;
-        console.log(e.courses[i]);
-        process.stdin.on('data', function (text) {
-            var loop = true;
-            while(loop && i < e.courses.length) {
-                i++;
-                if(e.courses[i] != undefined) {
-                    loop = e.courses[i].name.search(/C\+\+/) < 0 || e.courses[i].group[0] !== "2C";
-                }
-            }
-            console.log(i);
-            console.log(e.courses[i]);
-        });
+    updater.getCalendar(this.idPlanning, function (e) {
+        me.data = e;
+        console.log("Done");
+        // var i=0;
+        // console.log(e.courses[i]);
+        // process.stdin.on('data', function (text) {
+        //     var loop = true;
+        //     while(loop && i < e.courses.length) {
+        //         i++;
+        //         if(e.courses[i] != undefined) {
+        //             loop = e.courses[i].name.search(/C\+\+/) < 0 || e.courses[i].group[0] !== "2C";
+        //         }
+        //     }
+        //     console.log(i);
+        //     console.log(e.courses[i]);
+        // });
+
+        if(callback) callback();
     });
 };
 
+/**
+ * @description determine if an array contains one or more items from another array.
+ * @param {array} oneOf the array to search.
+ * @param {array} inArray the array providing items to check for in the haystack.
+ * @return {boolean} true|false if haystack contains at least one item from arr.
+ */
+var findOne = function (oneOf, inArray) {
+    if(inArray == undefined || oneOf == undefined) return false;
 
+    for(elem of oneOf) {
+        if(inArray.includes(elem)) return true;
+    }
+    return false;
+};
+
+Planning.prototype.getCourses = function (groups) {
+    if(!groups) throw "Param null";
+
+    var me = this;
+    var ret = [];
+    for(truc of this.data.courses) {
+        if(findOne(groups,truc.group)) {
+            ret.push(truc);
+        }
+    }
+
+    return ret;
+}
 
 module.exports = Planning;

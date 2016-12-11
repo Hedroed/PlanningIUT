@@ -1,4 +1,5 @@
 const https = require('https');
+const moment = require('../node_modules/moment');
 
 var getCalendar = function(idCalendar, callback){
     var options = {
@@ -20,7 +21,7 @@ var getCalendar = function(idCalendar, callback){
 }
 
 var parse = function(data,callback) {
-    var json = {courses:[]};
+    var json = [];
     var arrayDataCalendar = data.split("\r\n");
 
     var begin = false;
@@ -40,10 +41,12 @@ var parse = function(data,callback) {
         if (begin && course != null) {
             if (splitedLine[0] === "DTSTART"){
                 course.start = toDate(splitedLine[1]);
+                course.startFormat = moment(course.start.getTime()).format("DD/MM/YYYY HH:mm");
             }
 
             if (splitedLine[0] === "DTEND"){
                 course.end = toDate(splitedLine[1]);
+                course.endFormat = moment(course.end.getTime()).format("DD/MM/YYYY HH:mm");
             }
 
             if (splitedLine[0] === "LOCATION"){
@@ -96,12 +99,23 @@ var parse = function(data,callback) {
 
         if (splitedLine[0] === "END" && splitedLine[1] === "VEVENT"){
             begin = false;
-            json.courses.push(course);
+            json.push(course);
             course = null;
         }
     }
 
-    if(callback) callback(json);
+    json.sort(function (a, b) {
+        if(a.start == undefined || b.start == undefined) return -1;
+
+        if (a.start.getTime() > b.start.getTime())
+            return 1;
+        if (a.start.getTime() < b.start.getTime())
+            return -1;
+        // a doit être égale à b
+        return 0;
+    });
+
+    if(callback) callback({courses : json});
 }
 
 function toDate(line) {

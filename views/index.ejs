@@ -5,7 +5,17 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
+    <div class="courses">
+        <% for(var i=0; i<courses.length; i++) {  %>
+            <div>
+                <h1><%= courses[i].name %></h1>
+
+                <div class="date-start"><%= courses[i].startFormat %></div>
+                <div class="date-end"><%= courses[i].endFormat %></div>
+                <%= courses[i].location %> <br>
+                <%= courses[i].description %>
+            </div>
+        <% } %>
+    </div>
   </body>
 </html>
