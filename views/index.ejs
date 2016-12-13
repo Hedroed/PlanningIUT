@@ -2,20 +2,37 @@
 <html>
   <head>
     <title><%= title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>
-    <div class="courses">
-        <% for(var i=0; i<courses.length; i++) {  %>
-            <div>
-                <h1><%= courses[i].name %></h1>
+    <input type="checkbox" id="side-checkbox"></input>
 
-                <div class="date-start"><%= courses[i].startFormat %></div>
-                <div class="date-end"><%= courses[i].endFormat %></div>
-                <%= courses[i].location %> <br>
-                <%= courses[i].description %>
+    <div class="page">
+        <label id="side-icon" for="side-checkbox">☰</label>
+
+        <div class="courses">
+            <section>
+                <% for(var i=0; i<courses.length; i++) {  %>
+                    <div class="course">
+                        <h2><%= courses[i].name %></h1>
+
+                        <div>
+                            <div class="date end"><%= courses[i].endFormat %></div>
+                            -
+                            <div class="date start"><%= courses[i].startFormat %></div>
+                        </div>
+                        <%= courses[i].location %> <br>
+                        <%= courses[i].description %>
+                    </div>
+                    <% } %>
+                </div>
+            </section>
+
+            <div class="sideBar">
+                <p></p>
             </div>
-        <% } %>
     </div>
+
   </body>
 </html>
