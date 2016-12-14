@@ -9,11 +9,22 @@
     <input type="checkbox" id="side-checkbox"></input>
 
     <div class="page">
-        <label id="side-icon" for="side-checkbox">☰</label>
+        <label class="icon" id="side-icon" for="side-checkbox">☰</label>
+        <span id="scroll-text">Scroll top </span>
+        <div class="icon" id="up-icon">⧋</div>
 
         <div class="courses">
             <section>
-                <% for(var i=0; i<courses.length; i++) {  %>
+                <h1><%= title %></h1>
+                <%  var lastDate;
+                    for(var i=0; i<courses.length; i++) {
+                        if(lastDate) {
+                            if(courses[i].start.getDate() != lastDate) { %>
+                                <div class="line"></div>
+                            <% }
+                        }
+                        lastDate = courses[i].start.getDate();
+                     %>
                     <div class="course">
                         <h2><%= courses[i].name %></h1>
 
@@ -30,9 +41,24 @@
             </section>
 
             <div class="sideBar">
-                <p></p>
+                <h2>Selection groupe</h2>
+                <form class="groupSelector" action="/" method="get">
+                    <select name="group" class="select" id="selectGroup">
+                        <%
+                        for ( var i = 0; i < options.length; i++ )
+                        {
+                            var res = ( options[ i ] === selected ) ? "selected" : "";
+                            %><option value="<%=options[ i ] %>" <%=res %>><%=options[ i ] %></option><%
+                        }
+                        %>
+                    </select>
+                    <input type="submit" value="Valider" class="select" id="sendGroup">
+                    <input type="submit" value="Sauvegarder" class="select" id="saveGroup">
+                </form>
             </div>
     </div>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="/js/save.js"></script>
   </body>
 </html>

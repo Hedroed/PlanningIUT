@@ -44,14 +44,20 @@ var findOne = function (oneOf, inArray) {
     return false;
 };
 
-Planning.prototype.getCourses = function (groups) {
+Planning.prototype.getCourses = function (groups, fromNow) {
     if(!groups) throw "Param null";
+    if(!fromNow) fromNow = false;
 
     var me = this;
     var ret = [];
     for(truc of this.data.courses) {
         if(findOne(groups,truc.group)) {
-            ret.push(truc);
+            if(fromNow) {
+                if(truc.start > Date.now()) ret.push(truc);
+            }
+            else {
+                ret.push(truc);
+            }
         }
     }
 

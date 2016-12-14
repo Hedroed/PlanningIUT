@@ -7,18 +7,22 @@ plan.updatePlanning();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
+
     var param = req.query.group;
+    if(!param) param = req.cookies.group;
+    else if(!param) param = "2C1";
+
 
     var group = [param, param.substring(0,param.length-1), param.substring(0,param.length-2)];
     //console.log(group);
-    var courses = plan.getCourses(group);
+    var courses = plan.getCourses(group, true);
 
     // for(var i=0; i < courses.length; i++) {
     //     courses[i].start = moment(courses[i].start).format('LLL');
     //     courses[i].end = moment(courses[i].end).format('LLL');
     // }
-
-    res.render('index', { title: 'Planning '+param, courses: courses });
+    var options = [ "2A1", "2A2", "2B1", "2B2", "2C1", "2C2", "2D1", "2D2" ];
+    res.render('index', { title: 'Planning '+param, courses: courses, options: options, selected: param });
 });
 
 setInterval(()=>{

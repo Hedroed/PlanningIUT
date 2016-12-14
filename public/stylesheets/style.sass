@@ -1,62 +1,136 @@
+$emerald: #20b390
+$emerald-light: #9ac1af
+
+$slide-duration: 0.5s
+
 body
   margin: 0
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif
   position: relative
   width: 100%
-  overflow-x: hidden
+  height: 100vh
+  overflow: hidden
   background-color: #eee
 
 a
   color: #00B7FF
 
+.page
+    height: 100vh
+    overflow-x: hidden
+
 /* Courses */
 .courses
     z-index: 0
     padding-left: 38px
-    transition: ease-in-out 0.5s
+    transition: ease-in-out $slide-duration
     width: calc(100% - 38px)
-    max-width: 600px
+    --max-width: 600px
+    overflow-y: scroll
+    height: 100%
 
-    .course
-        width: 80%
-        height: 90px
-        background-color: #ddd
-        margin: 10px
-        padding: 5px 10px
-        box-shadow: 0px 3px 5px #ddd
-        border-top-right-radius: 5px
-        border-bottom-right-radius: 5px
-        border-bottom-left-radius: 5px
+    section
+        width: 90%
 
-    h2
-        margin: 5px 0px
-        height: 24px
-        overflow: hidden
+        h1
+            text-align: right
+            margin: 10px
+            color: $emerald
 
-    .date
-        display: inline-block
+        .course
+            height: 90px
+            background-color: #ddd
+            margin: 10px 0px
+            padding: 5px 10px
+            box-shadow: 0px 3px 5px #ddd
+            border-top-right-radius: 5px
+            border-bottom-right-radius: 5px
+            border-bottom-left-radius: 5px
+
+        h2
+            margin: 5px 0px
+            height: 24px
+            overflow: hidden
+
+        .date
+            display: inline-block
+
+        .line
+            width: 95%
+            height: 1px
+            margin: auto
+            margin-top: 12px
+            margin-bottom: 4px
+            border-bottom: 2px solid $emerald-light
 
 
 /* Side bar*/
 .sideBar
     width: 320px
-    height: 100%
+    height: 100vh
     z-index: 1
     position: fixed
     left: -320px
     top: 0px
     background:
         color: #222
-    transition: left ease-in-out 0.5s
+    transition: left ease-in-out $slide-duration
+
+    text-align: center
+
+    /*form*/
+    h2
+        color: $emerald
+        margin-top: 30px
+        margin-bottom: 4px
+
+    form.groupSelector
+        width: 200px
+        display: inline-block
+
+        .select
+            background-color: $emerald
+            color: white
+            border: none
+            outline: none
+            width: 200px
+            padding: 10px 15px
+            border-radius: 5px
+
+        select
+            margin: 40px 0px
+
+        input
+            margin: 8px 0px
+
+
+.icon
+    transition: ease-in-out $slide-duration
 
 #side-icon
     z-index: 2
     position: fixed
     top: 1px
     left: 8px
-    font-size: 22px
-    transition: ease-in-out 0.5s
+    font-size: 24px
     cursor: pointer
+
+#up-icon
+    z-index: 3
+    position: fixed
+    bottom: 10px
+    left: 7px
+    font-size: 32px
+    cursor: pointer
+
+#scroll-text
+    z-index: 4
+    position: fixed
+    bottom: 16px
+    left: -110px
+    color: white
+    font-size: 18px
+    transition: ease-in-out $slide-duration
 
 #side-checkbox
     display: none
@@ -65,11 +139,14 @@ a
         .sideBar
             left: 0px
 
-        #side-icon
-            left: calc(320px - 25px)
+        .icon
+            left: calc(320px - 30px)
             color: white
             @media screen and (max-width: 319px)
                 left: 8px
+
+        #scroll-text
+            left: 208px
 
         .courses
             margin-left: 320px
