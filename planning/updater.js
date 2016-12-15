@@ -122,4 +122,4 @@ function toDate(line) {
     return new Date(Date.UTC(line.substring(0,4), +line.substring(4,6)-1, line.substring(6,8), line.substring(9,11), line.substring(11,13), line.substring(13,15)));
 }
 
-module.exports = {getCalendar: getCalendar};
+module.exports = {getCalendar: getCalendar, parse: parse};

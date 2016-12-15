@@ -1,5 +1,39 @@
-var updater = require('./updater');
+var updater = require('./updater'),
+	fs = require('fs');
 
+/*polyfill*/
+if (!Array.prototype.includes) {
+  Array.prototype.includes = function(searchElement /*, fromIndex*/ ) {
+    'use strict';
+    if (this == null) {
+      throw new TypeError('Array.prototype.includes called on null or undefined');
+    }
+    var O = Object(this);
+    var len = parseInt(O.length, 10) || 0;
+    if (len === 0) {
+      return false;
+    }
+    var n = parseInt(arguments[1], 10) || 0;
+    var k;
+    if (n >= 0) {
+      k = n;
+    } else {
+      k = len + n;
+      if (k < 0) {k = 0;}
+    }
+    var currentElement;
+    while (k < len) {
+      currentElement = O[k];
+      if (searchElement === currentElement ||
+         (searchElement !== searchElement && currentElement !== currentElement)) { // NaN !== NaN
+        return true;
+      }
+      k++;
+    }
+    return false;
+  };
+}
+	
 var Planning = function (id) {
     this.idPlanning = id;
     this.data = null;
@@ -7,26 +41,33 @@ var Planning = function (id) {
 
 Planning.prototype.updatePlanning = function (callback) {
     var me = this;
+	
+	if(this.local) {
+		fs.readFile(this.path, 'utf8', function (err,data) {
+			if (err) {
+				return console.log(err);
+			}
+			
+			updater.parse(data, (d) => {
+				me.data = d;
+				
+				console.log("Done");
+				if(callback) callback();
+			});
+		});
+	} else {
+		updater.getCalendar(this.idPlanning, function (e) {
+			me.data = e;
+			
+			console.log("Done");
+			if(callback) callback();
+		});
+	}
+};
 
-    updater.getCalendar(this.idPlanning, function (e) {
-        me.data = e;
-        console.log("Done");
-        // var i=0;
-        // console.log(e.courses[i]);
-        // process.stdin.on('data', function (text) {
-        //     var loop = true;
-        //     while(loop && i < e.courses.length) {
-        //         i++;
-        //         if(e.courses[i] != undefined) {
-        //             loop = e.courses[i].name.search(/C\+\+/) < 0 || e.courses[i].group[0] !== "2C";
-        //         }
-        //     }
-        //     console.log(i);
-        //     console.log(e.courses[i]);
-        // });
-
-        if(callback) callback();
-    });
+Planning.prototype.updateLocal = function (val, path) {
+    this.local = val;
+	this.path = path;
 };
 
 /**

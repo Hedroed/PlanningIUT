@@ -19,6 +19,9 @@ a
     height: 100vh
     overflow-x: hidden
 
+h1
+	font-family: 'Chela One', cursive;
+	
 /* Courses */
 .courses
     z-index: 0
@@ -36,6 +39,7 @@ a
             text-align: right
             margin: 10px
             color: $emerald
+            font-size: 30px
 
         .course
             height: 90px
@@ -79,7 +83,7 @@ a
     text-align: center
 
     /*form*/
-    h2
+    h1
         color: $emerald
         margin-top: 30px
         margin-bottom: 4px
@@ -131,6 +135,8 @@ a
     color: white
     font-size: 18px
     transition: ease-in-out $slide-duration
+    font-family: 'Chela One', cursive;
+    font-size: 20px
 
 #side-checkbox
     display: none
@@ -147,6 +153,8 @@ a
 
         #scroll-text
             left: 208px
+            @media screen and (max-width: 319px)
+                left: 40px
 
         .courses
             margin-left: 320px

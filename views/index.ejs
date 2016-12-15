@@ -4,6 +4,7 @@
     <title><%= title %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <link rel='stylesheet' href='/stylesheets/style.css' />
+	<link href="https://fonts.googleapis.com/css?family=Chela+One" rel="stylesheet">
   </head>
   <body>
     <input type="checkbox" id="side-checkbox"></input>
@@ -29,9 +30,9 @@
                         <h2><%= courses[i].name %></h1>
 
                         <div>
-                            <div class="date end"><%= courses[i].endFormat %></div>
-                            -
                             <div class="date start"><%= courses[i].startFormat %></div>
+                            -
+                            <div class="date end"><%= courses[i].endFormat %></div>
                         </div>
                         <%= courses[i].location %> <br>
                         <%= courses[i].description %>
@@ -41,7 +42,7 @@
             </section>
 
             <div class="sideBar">
-                <h2>Selection groupe</h2>
+                <h1>Sélection groupe</h1>
                 <form class="groupSelector" action="/" method="get">
                     <select name="group" class="select" id="selectGroup">
                         <%
@@ -58,7 +59,7 @@
             </div>
     </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="/js/jquery-3.1.1.min.js"></script>
     <script src="/js/save.js"></script>
   </body>
 </html>
