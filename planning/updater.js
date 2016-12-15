@@ -41,12 +41,12 @@ var parse = function(data,callback) {
         if (begin && course != null) {
             if (splitedLine[0] === "DTSTART"){
                 course.start = toDate(splitedLine[1]);
-                course.startFormat = moment(course.start.getTime()).format("DD/MM/YYYY HH:mm");
+                course.startFormat = moment(course.start.getTime()).format("DD/MM HH:mm");
             }
 
             if (splitedLine[0] === "DTEND"){
                 course.end = toDate(splitedLine[1]);
-                course.endFormat = moment(course.end.getTime()).format("DD/MM/YYYY HH:mm");
+                course.endFormat = moment(course.end.getTime()).format("DD/MM HH:mm");
             }
 
             if (splitedLine[0] === "LOCATION"){

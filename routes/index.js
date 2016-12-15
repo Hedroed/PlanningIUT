@@ -25,8 +25,10 @@ router.get('/', function(req, res, next) {
     //     courses[i].start = moment(courses[i].start).format('LLL');
     //     courses[i].end = moment(courses[i].end).format('LLL');
     // }
+    var moment = require('moment');
+    moment.locale("fr");
     var options = [ "2A1", "2A2", "2B1", "2B2", "2C1", "2C2", "2D1", "2D2" ];
-    res.render('index', { title: 'Planning '+param, courses: courses, options: options, selected: param });
+    res.render('index', { moment: moment, title: 'Planning '+param, courses: courses, options: options, selected: param });
 });
 
 setInterval(()=>{
