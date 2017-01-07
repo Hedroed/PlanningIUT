@@ -3,6 +3,9 @@ $emerald-light: #9ac1af
 
 $slide-duration: 0.5s
 
+*
+    box-sizing: border-box
+
 body
   margin: 0
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif
@@ -17,29 +20,32 @@ a
 
 .page
     height: 100vh
-    overflow-x: hidden
+    overflow: hidden
 
 h1
-	font-family: 'Chela One', cursive;
+	font-family: 'Chela One', cursive
+
+h1.title
+    text-align: right
+    margin: 10px
+    color: $emerald
+    font-size: 30px
+    width: 90%
+    transition: ease-in-out $slide-duration
 
 /* Courses */
 .courses
     z-index: 0
-    padding-left: 38px
+    padding-left: 50px
     transition: ease-in-out $slide-duration
-    width: calc(100% - 38px)
-    --max-width: 600px
+    width: 100%
+    --margin-left: 12px
     overflow-y: scroll
+    overflow-x: hidden
     height: 100%
 
     section
-        width: 90%
-
-        h1
-            text-align: right
-            margin: 10px
-            color: $emerald
-            font-size: 30px
+        width: 100%
 
         .course
             height: 90px
@@ -47,9 +53,9 @@ h1
             margin: 10px 0px
             padding: 5px 10px
             box-shadow: 0px 3px 5px #ddd
-            border-top-right-radius: 5px
-            border-bottom-right-radius: 5px
+            border-top-left-radius: 5px
             border-bottom-left-radius: 5px
+            width: 100%
 
         h2
             margin-top: 0
@@ -66,9 +72,8 @@ h1
             display: inline-block
 
         .line
-            width: 95%
-            --height: 12px
             margin: 12px 5px
+            margin-right: 50px
             border-top: 2px solid $emerald-light
             font-family: 'Chela One', cursive
             color: $emerald-light
@@ -84,7 +89,7 @@ h1
     top: 0px
     background:
         color: #222
-    transition: left ease-in-out $slide-duration
+    transition: ease-in-out $slide-duration
 
     text-align: center
 
@@ -101,17 +106,24 @@ h1
         .select
             background-color: $emerald
             color: white
-            border: none
             outline: none
+            border: 1px solid $emerald
             width: 200px
             padding: 10px 15px
             border-radius: 5px
+            cursor: pointer
 
         select
             margin: 40px 0px
 
         input
+            cursor: pointer
             margin: 8px 0px
+            border: 1px solid $emerald
+            transition: ease $slide-duration
+
+            &:hover
+                border: 1px solid darken( $emerald, 20% )
 
     footer
         height: 30px
@@ -126,24 +138,38 @@ h1
 .icon
     transition: ease-in-out $slide-duration
     height: 38px
-    width: 30px
+    width: 38px
     text-align: center
+    left: 6px
+    position: fixed
+    cursor: pointer
 
 #side-icon
     z-index: 2
     position: fixed
-    top: 1px
-    left: 6px
-    font-size: 24px
-    cursor: pointer
+    top: 4px
+    font-size: 30px
 
 #up-icon
     z-index: 3
-    position: fixed
-    bottom: 40px
-    left: 5px
-    font-size: 32px
-    cursor: pointer
+    bottom: 38px
+    font-size: 38px
+
+    i
+        position: relative
+        bottom: 3px
+
+    #bg-scroll
+        height: 100%
+        width: 100%
+        transform: scale(0)
+        border-radius: 50%
+        background-color: $emerald-light
+        position: absolute
+        transition: ease-in-out $slide-duration
+
+        &.active
+            transform: scale(1)
 
 #scroll-text
     z-index: 4
@@ -161,20 +187,28 @@ h1
 
     &:checked + .page
 
+        .title
+            @media screen and (max-width: 550px)
+                margin-left: 320px
+
         .icon
-            left: 320px - 30px
+            transform: translateX(320px - 4px - 38px)
             color: white
             @media screen and (max-width: 319px)
-                left: 8px
+                transform: translateX(0px)
 
         #scroll-text
-            left: 208px
+            transform: translateX(320px)
             @media screen and (max-width: 319px)
-                left: 40px
+                transform: translateX(155px)
+
+        #bg-scroll
+            transform: scale(0)
 
         .courses
-            margin-left: 320px
+            --margin-left: 320px
+            transform: translateX(320px)
             padding-left: 15px
 
         .sideBar
-            left: 0px
+            transform: translateX(320px)

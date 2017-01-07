@@ -5,42 +5,48 @@
     <meta charset="iso-8859-1">
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
 	<link href="https://fonts.googleapis.com/css?family=Chela+One" rel="stylesheet">
   </head>
   <body>
     <input type="checkbox" id="side-checkbox"></input>
 
     <div class="page">
-        <label class="icon" id="side-icon" for="side-checkbox">&#9776;</label>
+        <label class="icon" id="side-icon" for="side-checkbox">
+            <span>
+                <i class="fa fa-bars"></i>
+            </span>
+        </label>
         <span id="scroll-text">Scroll top </span>
-        <div class="icon" id="up-icon">⧋</div>
+        <span class="icon" id="up-icon"  title="Scroll top">
+            <div id="bg-scroll" class=""></div>
+            <i class="fa fa-angle-double-up"></i>
+        </span>
 
+        <h1 class="title"><%= title %></h1>
         <div class="courses">
             <section>
-                <h1><%= title %></h1>
-                <%  var lastDate;
-                for(var i=0; i<courses.length; i++) {
-                    var momentStart = moment(courses[i].start),
-                        momentEnd = moment(courses[i].end);
-                    if(lastDate) {
-                        if(courses[i].start.getDate() != lastDate) { %>
-                            <div class="line"><%= momentStart.format("D MMMM YYYY"); %></div>
-                        <% }
-                    }
-                    lastDate = courses[i].start.getDate();
-                     %>
-                    <div class="course">
-                        <h2><%= courses[i].name %></h1>
+                <%  var lastDate = 0;
+                    for(var i=0; i<courses.length; i++) {
+                        var momentStart = moment(courses[i].start),
+                            momentEnd = moment(courses[i].end);
+                        if(courses[i].start.getDate() != lastDate) {
+                             %> <div class="line"><%= momentStart.format("dddd D MMMM YYYY"); %></div> <%
+                        }
+                        lastDate = courses[i].start.getDate();
+                %>
+                <div class="course">
+                    <h2><%= courses[i].name %></h1>
 
-                        <div>
-                            <div class="course-text date start"><%= momentStart.format("Do MMMM HH:mm"); %></div>
-                            -
-                            <div class=" course-text date end"><%= momentEnd.format("Do MMMM HH:mm"); %></div>
-                        </div>
-                        <div class="course-text"><%= courses[i].location %></div>
-                        <div class="course-text"><%= courses[i].description %></div>
+                    <div>
+                        <div class="course-text date start"><%= momentStart.format("Do MMMM HH:mm"); %></div>
+                        -
+                        <div class=" course-text date end"><%= momentEnd.format("Do MMMM HH:mm"); %></div>
                     </div>
+                    <div class="course-text"><%= courses[i].location %></div>
+                    <div class="course-text"><%= courses[i].description %></div>
+                </div>
                 <% } %>
             </section>
         </div>

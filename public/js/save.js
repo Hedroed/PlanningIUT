@@ -17,5 +17,14 @@ $(function(){
         $('.courses').animate({ scrollTop: 0 }, 'slow');
     });
 
+    $('.courses').scroll(function(){
+        if($('.courses').scrollTop() > 1) {
+            $("#bg-scroll").addClass("active");
+        }
+        else {
+            $("#bg-scroll").removeClass("active");
+        }
+    });
+
 
 });
