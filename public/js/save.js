@@ -13,6 +13,16 @@ $(function(){
         document.cookie = "group="+ sel +"; expires="+ d;
     });
 
+    $("#selectDeps").on("change", function(e){
+        var select = $("#selectDeps option:selected").text();
+        $("#selectGroup option").each(function(i, e) {
+            $(e).addClass("hide");
+        });
+        $("#selectGroup option[dep="+select+"]").each(function(i, e) {
+            $(e).removeClass("hide");
+        });
+    });
+
     $("#up-icon").on("click", function(e){
         $('.courses').animate({ scrollTop: 0 }, 'slow');
     });

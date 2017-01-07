@@ -54,13 +54,26 @@
         <div class="sideBar">
             <h1>Sélection groupe</h1>
             <form class="groupSelector" action="/" method="get">
+                <select class="select" id="selectDeps">
+                    <%
+                    for ( var i = 0; i < options.deps.length; i++ )
+                    {
+                        var res = ( options.deps[ i ] === selectedDep ) ? "selected" : "";
+                        %><option value="<%=options.deps[ i ] %>" <%=res %>><%=options.deps[ i ] %></option><%
+                    }
+                    %>
+                </select>
                 <select name="group" class="select" id="selectGroup">
                     <%
-                    for ( var i = 0; i < options.length; i++ )
-                    {
-                        var res = ( options[ i ] === selected ) ? "selected" : "";
-                        %><option value="<%=options[ i ] %>" <%=res %>><%=options[ i ] %></option><%
-                    }
+                        for ( var j = 0; j < options.deps.length; j++ ) {
+                            var dep = options.deps[ j ];
+                            var dis = ( dep === selectedDep ) ? "" : "hide";
+                            for ( var i = 0; i < options[dep].length; i++ )
+                            {
+                                var res = ( options[dep][ i ] === selectedGroup ) ? "selected" : "";
+                                %><option dep="<%=dep %>" value="<%=options[dep][ i ] %>" <%=res %> class="<%=dis %>"><%=options[dep][ i ] %></option><%
+                            }
+                        }
                     %>
                 </select>
                 <input type="submit" value="Valider" class="select" id="sendGroup">

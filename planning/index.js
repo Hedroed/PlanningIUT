@@ -33,24 +33,25 @@ if (!Array.prototype.includes) {
     return false;
   };
 }
-	
+
 var Planning = function (id) {
     this.idPlanning = id;
     this.data = null;
 }
 
+//Get planning information from web or local and update data
 Planning.prototype.updatePlanning = function (callback) {
     var me = this;
-	
+
 	if(this.local) {
 		fs.readFile(this.path, 'utf8', function (err,data) {
 			if (err) {
 				return console.log(err);
 			}
-			
+
 			updater.parse(data, (d) => {
 				me.data = d;
-				
+
 				console.log("Done");
 				if(callback) callback();
 			});
@@ -58,13 +59,14 @@ Planning.prototype.updatePlanning = function (callback) {
 	} else {
 		updater.getCalendar(this.idPlanning, function (e) {
 			me.data = e;
-			
+
 			console.log("Done");
 			if(callback) callback();
 		});
 	}
 };
 
+//Define if data update will be in local or not and specify the path to the local file
 Planning.prototype.updateLocal = function (val, path) {
     this.local = val;
 	this.path = path;
@@ -85,6 +87,7 @@ var findOne = function (oneOf, inArray) {
     return false;
 };
 
+//Get courses of a specify group
 Planning.prototype.getCourses = function (groups, fromNow) {
     if(!groups) throw "Param null";
     if(!fromNow) fromNow = false;
@@ -92,7 +95,10 @@ Planning.prototype.getCourses = function (groups, fromNow) {
     var me = this;
     var ret = [];
     for(truc of this.data.courses) {
-        if(findOne(groups,truc.group)) {
+		if(!truc.group) {
+			ret.push(truc);
+		}
+		else if(findOne(groups,truc.group)) {
             if(fromNow) {
                 if(truc.start > Date.now()) ret.push(truc);
             }

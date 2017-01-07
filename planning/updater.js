@@ -1,6 +1,7 @@
 const https = require('https');
 const moment = require('../node_modules/moment');
 
+//Get planning information from web
 var getCalendar = function(idCalendar, callback){
     var options = {
         host: 'planning.univ-ubs.fr',
@@ -20,7 +21,13 @@ var getCalendar = function(idCalendar, callback){
     }).end();
 }
 
+//Parse ics file format
 var parse = function(data,callback) {
+    //parse line into date object
+    function toDate(line) {
+        return new Date(Date.UTC(line.substring(0,4), +line.substring(4,6)-1, line.substring(6,8), line.substring(9,11), line.substring(11,13), line.substring(13,15)));
+    }
+
     var json = [];
     var arrayDataCalendar = data.split("\r\n");
 
@@ -41,12 +48,12 @@ var parse = function(data,callback) {
         if (begin && course != null) {
             if (splitedLine[0] === "DTSTART"){
                 course.start = toDate(splitedLine[1]);
-                course.startFormat = moment(course.start.getTime()).format("DD/MM HH:mm");
+                // course.startFormat = moment(course.start.getTime()).format("DD/MM HH:mm");
             }
 
             if (splitedLine[0] === "DTEND"){
                 course.end = toDate(splitedLine[1]);
-                course.endFormat = moment(course.end.getTime()).format("DD/MM HH:mm");
+                // course.endFormat = moment(course.end.getTime()).format("DD/MM HH:mm");
             }
 
             if (splitedLine[0] === "LOCATION"){
@@ -69,8 +76,8 @@ var parse = function(data,callback) {
                 tab.pop();
                 tab.shift();
 
-                var allGroup = /(GR|Gr|Groupe|INFO|STID|LP|LPCEL)/;
-                var sameGroup = /(GR|Gr|Groupe)/;
+                var allGroup = /(GR|Gr|Groupe|groupe|INFO|STID|LP|LPCEL)/;
+                var sameGroup = /(GR|Gr|Groupe|groupe)/;
                 var ret = [];
 
                 for(elem of tab) {
@@ -118,8 +125,5 @@ var parse = function(data,callback) {
     if(callback) callback({courses : json});
 }
 
-function toDate(line) {
-    return new Date(Date.UTC(line.substring(0,4), +line.substring(4,6)-1, line.substring(6,8), line.substring(9,11), line.substring(11,13), line.substring(13,15)));
-}
 
 module.exports = {getCalendar: getCalendar, parse: parse};
