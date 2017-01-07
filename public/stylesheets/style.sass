@@ -26,12 +26,13 @@ a
     overflow: hidden
 
 h1
-	font-family: 'Chela One', cursive
+    text-shadow: darken( $emerald, 10% ) 0px 1px 0px, darken( $emerald, 12% ) 0px 2px 0px, darken( $emerald, 14% ) 0px 3px 0px, darken( $emerald, 16% ) 0px 4px 0px
+    color: $emerald
+    font-family: 'Chela One', cursive
 
 h1.title
     text-align: right
     margin: 10px
-    color: $emerald
     font-size: 30px
     width: 90%
     transition: ease-in-out $slide-duration
@@ -65,11 +66,23 @@ h1.title
             margin-bottom: 5px
             overflow: hidden
             font-size: 20px
-            max-height: 38px
-            @media screen and (max-width: 340px)
-                font-size: 5vw
-            @media screen and (min-width: 341px) and (max-width: 500px)
-                font-size: 4vw
+            max-height: 34px
+            font-family: "Century Gothic", Helvetica
+            // @media screen and (max-width: 340px)
+            //     font-size: 5vw
+            // @media screen and (min-width: 341px) and (max-width: 440px)
+            //     font-size: 4vw
+            @media screen and (min-width: 501px) and (max-width: 700px)
+                font-size: 16px
+            @media screen and (min-width: 301px) and (max-width: 500px)
+                font-size: 13px
+                max-height: 38px
+                margin-bottom: 0
+            @media screen and (max-width: 300px)
+                font-size: 12px
+        .course-text
+            @media screen and (max-width: 500px)
+                font-size: 13px
 
         .date
             display: inline-block
@@ -98,9 +111,10 @@ h1.title
 
     /*form*/
     h1
-        color: $emerald
         margin-top: 30px
         margin-bottom: 4px
+        @media screen and (max-height: 650px)
+            margin-top: 10px
 
     form.groupSelector
         width: 200px
@@ -118,6 +132,8 @@ h1.title
 
         select
             margin: 20px 0px
+            @media screen and (max-height: 650px)
+                margin: 8px 0px
 
         input
             cursor: pointer
@@ -127,6 +143,27 @@ h1.title
 
             &:hover
                 border: 1px solid darken( $emerald, 20% )
+
+    .unused
+        font-family: "Century Gothic", Helvetica
+        color: white
+        text-align: center
+
+        ul
+            list-style-type: none
+            display: inline-block
+            width: 150px
+            padding: 0
+            margin: 12px
+            @media screen and (max-height: 650px)
+                margin: 0
+            @media screen and (max-height: 540px)
+                width: 250px
+
+        li
+            display: inline-block
+            padding: 5px 7px
+            font-size: 18px
 
     footer
         height: 30px

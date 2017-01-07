@@ -79,6 +79,20 @@
                 <input type="submit" value="Valider" class="select" id="sendGroup">
                 <input type="submit" value="Sauvegarder" class="select" id="saveGroup">
             </form>
+            <div class="unused">
+                <%var s = unused.length === 1 ? "":"s" %>
+                <h1>Salle<%=s%> info<%=s%> libre<%=s%> à <%= moment().format("HH:mm")%></h1>
+                <ul>
+                <%
+                    if(unused.length === 0) {
+                        %><li>Aucune :(</li><%
+                    }
+                    for(var i=0; i<unused.length; i++) {
+                        %><li><%=unused[i]%></li><%
+                    }
+                %>
+                </ul>
+            </div>
             <footer>Copyright (c) 2016 RYDIN Nathan and LUX Mathieu All Rights Reserved.</footer>
         </div>
     </div>
