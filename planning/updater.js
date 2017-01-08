@@ -60,7 +60,7 @@ var parse = function(data,callback) {
                 var roomName = /.*(B \d{3}|Amphi [ABC]|Jocker \d|Joker \d).*/;
                 course.location = [];
                 var rooms = splitedLine[1].split('\\,');
-                for(elem of rooms){
+                for( var elem of rooms){
                     var room = roomName.exec(elem);
                     if(room != null) course.location.push(room[1]);
                 }

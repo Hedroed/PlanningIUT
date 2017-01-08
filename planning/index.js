@@ -81,7 +81,7 @@ Planning.prototype.updateLocal = function (val, path) {
 var findOne = function (oneOf, inArray) {
     if(inArray == undefined || oneOf == undefined) return false;
 
-    for(elem of oneOf) {
+    for( var elem of oneOf) {
         if(inArray.includes(elem)) return true;
     }
     return false;
@@ -94,7 +94,7 @@ Planning.prototype.getCourses = function (groups, fromNow) {
 
     var me = this;
     var ret = [];
-    for(truc of this.data.courses) {
+    for( var truc of this.data.courses) {
 		if(!truc.group) {
 			ret.push(truc);
 		}

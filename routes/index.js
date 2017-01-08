@@ -17,7 +17,7 @@ planInfo2.updatePlanning();
 planInfo1.updatePlanning();
 
 //Select options for the <select>
-var deps = [ "INFO1", "INFO2"];
+var deps = [ "INFO1", "INFO2"],
     groupsInfo1 = [ "1A1", "1A2", "1B1", "1B2", "1C1", "1C2", "1D1", "1D2" ],
     groupsInfo2 = [ "2A1", "2A2", "2B1", "2B2", "2C1", "2C2", "2D1", "2D2" ];
 
