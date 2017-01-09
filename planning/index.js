@@ -100,7 +100,7 @@ Planning.prototype.getCourses = function (groups, fromNow) {
 		}
 		else if(findOne(groups,truc.group)) {
             if(fromNow) {
-                if(truc.start > Date.now()) ret.push(truc);
+                if(truc.end > Date.now()) ret.push(truc);
             }
             else {
                 ret.push(truc);
