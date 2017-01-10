@@ -94,6 +94,9 @@ h1.title
             color: $emerald-light
             font-size: 18px
 
+            &.bottom
+                border-bottom: 2px solid $emerald-light
+
 /* Side bar*/
 .sideBar
     width: 320px
@@ -116,8 +119,6 @@ h1.title
             margin-top: 10px
 
     form.groupSelector
-        width: 200px
-        display: inline-block
 
         .select
             background-color: $emerald
@@ -143,10 +144,28 @@ h1.title
             &:hover
                 border: 1px solid darken( $emerald, 20% )
 
+        #pop-up
+            opacity: 0
+            display: inline-block
+            transition: opacity 0.2s ease
+            p
+                width: 230px
+                border-radius: 3px
+                background-color: $emerald-light
+                color: white
+                font-family: "Century Gothic", Helvetica
+                margin: 0
+
+            &.active
+                opacity: 1
+
     .unused
         font-family: "Century Gothic", Helvetica
         color: white
         text-align: center
+
+        h1
+            margin-top: 5px
 
         ul
             list-style-type: none

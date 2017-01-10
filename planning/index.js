@@ -88,13 +88,14 @@ var findOne = function (oneOf, inArray) {
 };
 
 //Get courses of a specify group
-Planning.prototype.getCourses = function (groups, fromNow) {
+Planning.prototype.getCourses = function (groups, fromNow, maxCourses) {
     if(!groups) throw "Param null";
     if(!fromNow) fromNow = false;
 
     var me = this;
+	var count = 0;
     var ret = [];
-    for( var truc of this.data.courses) {
+    for(var truc of this.data.courses) {
 		if(!truc.group) {
 			ret.push(truc);
 		}
@@ -105,6 +106,10 @@ Planning.prototype.getCourses = function (groups, fromNow) {
             else {
                 ret.push(truc);
             }
+			if(maxCourses) {
+				count++;
+				if(count >= maxCourses) break;
+			}
         }
     }
 

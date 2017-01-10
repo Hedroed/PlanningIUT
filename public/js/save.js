@@ -1,14 +1,23 @@
 $(function(){
 
+    var popUpTimeout;
+
     $("#saveGroup").on("click", function(e){
         e.preventDefault();
         var sel = $("#selectGroup option:selected").text();
-        console.log("save "+sel);
-        $("#side-checkbox").prop('checked', false);
+        clearTimeout(popUpTimeout);
+        //console.log("save "+sel);
+        //$("#side-checkbox").prop('checked', false);
+        $('#pop-up p').html(sel+" sauvegardé");
+        $('#pop-up').addClass("active");
+
+        popUpTimeout = setTimeout(function() {
+            $('#pop-up').removeClass("active");
+        },5000);
 
         var d = new Date();
         d.setMonth(d.getMonth() + 3);
-        console.log(d);
+        // console.log(d);
 
         document.cookie = "group="+ sel +"; expires="+ d;
     });

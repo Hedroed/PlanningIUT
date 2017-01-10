@@ -33,7 +33,12 @@
                         var momentStart = moment(courses[i].start),
                             momentEnd = moment(courses[i].end);
                         if(courses[i].start.getDate() != lastDate) {
-                             %> <div class="line"><%= momentStart.format("dddd D MMMM YYYY"); %></div> <%
+                             if(courses[i].start.getDay() === 1) {
+                                 %> <div class="line bottom"><%= momentStart.format("dddd D MMMM YYYY"); %></div> <%
+                             }
+                             else {
+                                 %> <div class="line"><%= momentStart.format("dddd D MMMM YYYY"); %></div> <%
+                             }
                         }
                         lastDate = courses[i].start.getDate();
                 %>
@@ -79,6 +84,7 @@
                 </select>
                 <input type="submit" value="Valider" class="select" id="sendGroup">
                 <input type="submit" value="Sauvegarder" class="select" id="saveGroup">
+                <div id="pop-up" class=""><p>Error</p></div>
             </form>
             <div class="unused">
                 <%var s = unused.length === 1 ? "":"s" %>

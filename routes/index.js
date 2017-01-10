@@ -29,7 +29,7 @@ router.get('/', function(req, res, next) {
 
     var param = req.query.group || req.cookies.group || "2C1";
 
-    var paramChecker = /[1,2][A-D][1,2]/;
+    var paramChecker = /^[1,2][A-D][1,2]$/;
     if(!paramChecker.test(param)) param = "2D1";
 
     var paramInfo = param.substring(0,1);
@@ -37,7 +37,7 @@ router.get('/', function(req, res, next) {
     var group = [param, param.substring(0,param.length-1), paramInfo];
     var plan = paramInfo === "1" ? planInfo1 : planInfo2;
     console.log(group);
-    var courses = plan.getCourses(group, true);
+    var courses = plan.getCourses(group, true, 50);
 
     //get unused room
     var rooms = unusedRoom.sallesDisponibles(Date.now()+1000*60*15); //maintenant plus 15 minutes
@@ -47,10 +47,14 @@ router.get('/', function(req, res, next) {
 });
 
 setInterval(()=>{
+    console.log("update planning");
     planInfo2.updatePlanning();
     planInfo1.updatePlanning();
-    Calendar.updateCalendar(unusedRoom);
-    console.log("update");
 },30 * 60000); // 30 minutes
+
+setInterval(()=>{
+    console.log("update room");
+    Calendar.updateCalendar(unusedRoom);
+},45 * 60000); // 45 minutes
 
 module.exports = router;
