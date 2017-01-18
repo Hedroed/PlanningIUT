@@ -21,8 +21,9 @@ app.set('port', port);
  */
 
 var serverHttps = https.createServer({
-	  key: fs.readFileSync('key.pem','utf8'),
-	  cert: fs.readFileSync('cert.pem','utf8')
+	  key: fs.readFileSync('/etc/letsencrypt/live/planningiut.fr/privkey.pem','utf8'),
+	  cert: fs.readFileSync('/etc/letsencrypt/live/planningiut.fr/cert.pem','utf8'),
+	  ca: fs.readFileSync('/etc/letsencrypt/live/planningiut.fr/chain.pem', 'utf8')
 	}, app);
  
  var serverHttp = http.createServer(app);
@@ -35,7 +36,7 @@ serverHttp.listen(port);
 serverHttp.on('error', onError);
 serverHttp.on('listening', onListening);
 
-serverHttps.listen(8080);
+serverHttps.listen(443);
 serverHttps.on('error', onError);
 serverHttps.on('listening', onListening);
 /**
