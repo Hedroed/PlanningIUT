@@ -12,17 +12,17 @@ router.get('/', function(req, res, next) {
 
     var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
     console.log(ip);
-    
+
     console.log(req.query);
-    
+
     if (req.query['hub.mode'] === 'subscribe' &&
         req.query['hub.verify_token'] === "salut_je_suis_content") {
         console.log("Validating webhook");
         res.status(200).send(req.query['hub.challenge']);
     } else {
         console.error("Failed validation. Make sure the validation tokens match.");
-        res.sendStatus(403);          
-    }  
+        res.sendStatus(403);
+    }
 });
 
 router.post('/', function (req, res) {
@@ -57,48 +57,66 @@ router.post('/', function (req, res) {
 });
 
 function receivedMessage(event) {
-  var senderID = event.sender.id;
-  var recipientID = event.recipient.id;
-  var timeOfMessage = event.timestamp;
-  var message = event.message;
+    var senderID = event.sender.id;
+    var recipientID = event.recipient.id;
+    var timeOfMessage = event.timestamp;
+    var message = event.message;
 
-  console.log("Received message for user %d and page %d at %d with message:", 
+    console.log("Received message for user %d and page %d at %d with message:",
     senderID, recipientID, timeOfMessage);
-  console.log(JSON.stringify(message));
+    console.log(JSON.stringify(message));
 
-  var messageId = message.mid;
+    var messageId = message.mid;
 
-  var messageText = message.text;
-  var messageAttachments = message.attachments;
+    var messageText = message.text;
+    var messageAttachments = message.attachments;
 
-  if (messageText) {
+    if (messageText) {
 
-    // If we receive a text message, check to see if it matches a keyword
-    // and send back the example. Otherwise, just echo the text we received.
-    sendTextMessage(senderID, messageText);
-    
-  } else if (messageAttachments) {
-    sendTextMessage(senderID, "Message with attachment received");
-  }
+        // if(messageText.test(""))
+
+        getUserInfo(senderID, (user)=>{
+            var title = (user.gender === "male" ? "Mr":"Mme");
+            callSendAPI(genTextMessage(senderID, "Bonjour "+title+" "+user.first_name+" "+user.last_name));
+        });
+
+        // If we receive a text message, check to see if it matches a keyword
+        // and send back the example. Otherwise, just echo the text we received.
+
+    } else if (messageAttachments) {
+        callSendAPI(genTextMessage(senderID, "Message with attachment received"));
+    }
 }
 
-function sendTextMessage(recipientId, messageText) {
-  var messageData = {
-    recipient: {
-      id: recipientId
-    },
-    message: {
-    //  text: messageText,
-      attachment:{
-          type:"image",
-          payload:{
-            url:"https://scontent.xx.fbcdn.net/v/t1.0-1/406650_436530976412124_479066119_n.jpg?oh=2338c87c46de9cfe9ea0d58c363a86d7&oe=5911CAC1"
-          }
+function genTextMessage(recipientId, messageText) {
+    var messageData = {
+        recipient: {
+            id: recipientId
+        },
+        message: {
+            text: messageText
         }
-    }
-  };
+    };
 
-  callSendAPI(messageData);
+    return messageData;
+}
+
+function genImageMessage(recipientId, imageUrl) {
+    var messageData = {
+        recipient: {
+            id: recipientId
+        },
+        message: {
+            attachment:{
+                type:"image",
+                payload:{
+                    url:imageUrl
+                }
+            }
+        }
+    };
+
+    return messageData;
 }
 
 function callSendAPI(messageData) {
@@ -113,14 +131,40 @@ function callSendAPI(messageData) {
       var recipientId = body.recipient_id;
       var messageId = body.message_id;
 
-      console.log("Successfully sent generic message with id %s to recipient %s", 
+      console.log("Successfully sent generic message with id %s to recipient %s",
         messageId, recipientId);
     } else {
       console.error("Unable to send message.");
       console.error(response);
       console.error(error);
     }
-  });  
+  });
+}
+
+function getUserInfo(userId, cb) {
+    if(!cb) throw "no callback";
+
+    request({
+        uri: 'https://graph.facebook.com/v2.6/'+userId,
+        qs: {
+            fields: "first_name,last_name,profile_pic,gender,locale",
+            access_token: token
+        },
+        method: 'GET'
+    }, function(error, response, body) {
+        if (!error && response.statusCode == 200) {
+          console.log("Successfully sent generic message with id %s to recipient %s")
+          cb(body);
+
+        } else {
+          console.error("Unable to get user info.");
+          console.error(response);
+          console.error(error);
+        }
+    });
+
+    https://graph.facebook.com/v2.6/<USER_ID>?fields=first_name,last_name,profile_pic,locale,timezone,gender&access_token=PAGE_ACCESS_TOKEN
+
 }
 
 module.exports = router;
