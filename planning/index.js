@@ -101,13 +101,18 @@ Planning.prototype.getCourses = function (groups, fromNow, maxCourses) {
 		}
 		else if(findOne(groups,truc.group)) {
             if(fromNow) {
-                if(truc.end > Date.now()) ret.push(truc);
+                if(truc.end > Date.now())  {
+                  ret.push(truc);
+                  count++;
+                }
             }
             else {
-                ret.push(truc);
+                if(truc.start > Date.now())  {
+                    ret.push(truc);
+                    count++;
+                }
             }
 			if(maxCourses) {
-				count++;
 				if(count >= maxCourses) break;
 			}
         }

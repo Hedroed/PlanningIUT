@@ -39,7 +39,7 @@ router.post('/', function (req, res) {
       // Iterate over each messaging event
       entry.messaging.forEach(function(event) {
         if (event.message) {
-          receivedMessage(event);
+          receivedMessage(event, req);
         } else {
           console.log("Webhook received unknown event: ", event);
         }
@@ -55,30 +55,41 @@ router.post('/', function (req, res) {
   }
 });
 
-var courseRegex = new RegExp('^courses? ([1,2][A-D][1,2])$', 'i');
+var courseRegex = new RegExp('^cours ([1,2][A-D][1,2])$', 'i');
 function receivedMessage(event, req) {
     var senderID = event.sender.id;
     var timeOfMessage = event.timestamp;
     var message = event.message;
-    console.log("Received for user %d at %s msg :",
-    senderID, moment(+timeOfMessage).format('lll'));
-    console.log(JSON.stringify(message));
+    console.log("Received for user %d at %s msg : %s",
+    senderID, moment(+timeOfMessage).format('lll'), message.text);
 
     var messageText = message.text;
     var messageAttachments = message.attachments;
 
     if (messageText) {
         var match = courseRegex.exec(messageText);
-        if(match[1]) {
+        if(match) {
             //parse group
             var param = match[1];
             var paramInfo = param.substring(0,1);
             var paramGroup = param.substring(1);
             var group = [param, param.substring(0,param.length-1), paramInfo];
-            var plan = (paramInfo === "1" ? req.planInfo1 : req.planInfo2);
-            console.log(group);
-            var courses = plan.getCourses(group, true, 1);
-            console.log(courses);
+            //console.log(group);
+            var plan = paramInfo === "1" ? req.planInfo1 : req.planInfo2;
+            var courses = plan.getCourses(group, false, 1);
+            //console.log(courses);
+            
+            if(courses[0]) {
+                var course = courses[0];
+                var ret = "";
+                ret += "Prochain : "+course.name+"\n";
+                ret += moment(+course.start).format('lll')+" - "+moment(+course.end).format('lll')+"\n";
+                ret += "en "+course.location+" avec "+course.description;            
+                
+                callSendAPI(genTextMessage(senderID, ret));
+            } else {
+                callSendAPI(genTextMessage(senderID, "Pas de cours :)"));
+            }
 
         } else {
             getUserInfo(senderID, (user)=>{
