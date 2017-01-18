@@ -56,7 +56,8 @@ router.post('/', function (req, res) {
   }
 });
 
-function receivedMessage(event) {
+var courseRegex = new RegExp('^courses? ([1,2][A-D][1,2])$', 'i');
+function receivedMessage(event, req) {
     var senderID = event.sender.id;
     var recipientID = event.recipient.id;
     var timeOfMessage = event.timestamp;
@@ -72,16 +73,24 @@ function receivedMessage(event) {
     var messageAttachments = message.attachments;
 
     if (messageText) {
+        var match = courseRegex.exec(messageText);
+        if(match[1]) {
+            //parse group
+            var param = match[1];
+            var paramInfo = param.substring(0,1);
+            var paramGroup = param.substring(1);
+            var group = [param, param.substring(0,param.length-1), paramInfo];
+            var plan = (paramInfo === "1" ? req.planInfo1 : req.planInfo2);
+            console.log(group);
+            var courses = plan.getCourses(group, true, 1);
+            console.log(courses);
 
-        // if(messageText.test(""))
-
-        getUserInfo(senderID, (user)=>{
-            var title = (user.gender === "male" ? "Mr":"Mme");
-            callSendAPI(genTextMessage(senderID, "Bonjour "+title+" "+user.first_name+" "+user.last_name));
-        });
-
-        // If we receive a text message, check to see if it matches a keyword
-        // and send back the example. Otherwise, just echo the text we received.
+        } else {
+            getUserInfo(senderID, (user)=>{
+                var title = (user.gender === "male" ? "Mr":"Mme");
+                callSendAPI(genTextMessage(senderID, "Bonjour "+title+" "+user.first_name+" "+user.last_name));
+            });
+        }
 
     } else if (messageAttachments) {
         callSendAPI(genTextMessage(senderID, "Message with attachment received"));
@@ -162,9 +171,6 @@ function getUserInfo(userId, cb) {
           console.error(error);
         }
     });
-
-    https://graph.facebook.com/v2.6/<USER_ID>?fields=first_name,last_name,profile_pic,locale,timezone,gender&access_token=PAGE_ACCESS_TOKEN
-
 }
 
 module.exports = router;
