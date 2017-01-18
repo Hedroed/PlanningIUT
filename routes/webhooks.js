@@ -27,7 +27,6 @@ router.get('/', function(req, res, next) {
 
 router.post('/', function (req, res) {
   var data = req.body;
-  console.log(data);
 
   // Make sure this is a page subscription
   if (data.object === 'page') {
@@ -59,15 +58,11 @@ router.post('/', function (req, res) {
 var courseRegex = new RegExp('^courses? ([1,2][A-D][1,2])$', 'i');
 function receivedMessage(event, req) {
     var senderID = event.sender.id;
-    var recipientID = event.recipient.id;
     var timeOfMessage = event.timestamp;
     var message = event.message;
-
-    console.log("Received message for user %d and page %d at %d with message:",
-    senderID, recipientID, timeOfMessage);
+    console.log("Received for user %d at %s msg :",
+    senderID, moment(+timeOfMessage).format('lll'));
     console.log(JSON.stringify(message));
-
-    var messageId = message.mid;
 
     var messageText = message.text;
     var messageAttachments = message.attachments;
@@ -84,7 +79,7 @@ function receivedMessage(event, req) {
             console.log(group);
             var courses = plan.getCourses(group, true, 1);
             console.log(courses);
-
+            
         } else {
             getUserInfo(senderID, (user)=>{
                 var title = (user.gender === "male" ? "Mr":"Mme");
@@ -140,7 +135,7 @@ function callSendAPI(messageData) {
       var recipientId = body.recipient_id;
       var messageId = body.message_id;
 
-      console.log("Successfully sent generic message with id %s to recipient %s",
+      console.log("Successfully sent message id %s to %s",
         messageId, recipientId);
     } else {
       console.error("Unable to send message.");
@@ -162,8 +157,7 @@ function getUserInfo(userId, cb) {
         method: 'GET'
     }, function(error, response, body) {
         if (!error && response.statusCode == 200) {
-          console.log("Successfully sent generic message with id %s to recipient %s")
-          cb(body);
+          cb(JSON.parse(body));
 
         } else {
           console.error("Unable to get user info.");
@@ -171,6 +165,12 @@ function getUserInfo(userId, cb) {
           console.error(error);
         }
     });
+<<<<<<< HEAD
+=======
+
+//    https://graph.facebook.com/v2.6/<USER_ID>?fields=first_name,last_name,profile_pic,locale,timezone,gender&access_token=PAGE_ACCESS_TOKEN
+
+>>>>>>> 285d3e4e66c4f0873f3d4aa7162ab5caf36751c1
 }
 
 module.exports = router;
