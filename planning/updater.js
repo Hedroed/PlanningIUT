@@ -38,40 +38,42 @@ var parse = function(data,callback) {
 
     for (var line of arrayDataCalendar){
         // console.log(line);
-        var splitedLine = line.split(':');
+        var separator = line.indexOf(':');
+        var startLine = line.substring(0, separator);
+        var endLine = line.substring(separator+1);
 
-        if (splitedLine[0] === "BEGIN" && splitedLine[1] === "VEVENT"){
+        if (startLine === "BEGIN" && endLine === "VEVENT"){
             begin = true;
             course = {};
         }
 
         if (begin && course != null) {
-            if (splitedLine[0] === "DTSTART"){
-                course.start = toDate(splitedLine[1]);
+            if (startLine === "DTSTART"){
+                course.start = toDate(endLine);
                 // course.startFormat = moment(course.start.getTime()).format("DD/MM HH:mm");
             }
 
-            if (splitedLine[0] === "DTEND"){
-                course.end = toDate(splitedLine[1]);
+            if (startLine === "DTEND"){
+                course.end = toDate(endLine);
                 // course.endFormat = moment(course.end.getTime()).format("DD/MM HH:mm");
             }
 
-            if (splitedLine[0] === "LOCATION"){
+            if (startLine === "LOCATION"){
                 var roomName = /.*(B \d{3}|Amphi [ABC]|Jocker \d|Joker \d).*/;
                 course.location = [];
-                var rooms = splitedLine[1].split('\\,');
+                var rooms = endLine.split('\\,');
                 for( var elem of rooms){
                     var room = roomName.exec(elem);
                     if(room != null) course.location.push(room[1]);
                 }
             }
 
-            if (splitedLine[0] === "SUMMARY"){
-                course.name = splitedLine[1].replace("\\,",",");
+            if (startLine === "SUMMARY"){
+                course.name = endLine.replace("\\,",",");
             }
 
-            if (splitedLine[0] === "DESCRIPTION"){
-                var line = splitedLine[1].split('(')[0];
+            if (startLine === "DESCRIPTION"){
+                var line = endLine.split('(')[0];
                 var tab = line.split('\\n');
                 tab.pop();
                 tab.shift();
@@ -100,11 +102,11 @@ var parse = function(data,callback) {
                 course.description = ret;
 
                 //var regex = /\\n(.*)\\n(.*)\\n(.*)/;
-                //course.description = regex.exec(splitedLine[1]);
+                //course.description = regex.exec(endLine);
             }
         }
 
-        if (splitedLine[0] === "END" && splitedLine[1] === "VEVENT"){
+        if (startLine === "END" && endLine === "VEVENT"){
             begin = false;
             json.push(course);
             course = null;
