@@ -94,11 +94,14 @@ function receivedMessage(event, req) {
         } else {
             getUserInfo(senderID, (user)=>{
                 var title = (user.gender === "male" ? "Mr":"Mme");
-                callSendAPI(genTextMessage(senderID, "Bonjour "+title+" "+user.first_name+" "+user.last_name));
+                //callSendAPI(genTextMessage(senderID, "Bonjour "+title+" "+user.first_name+" "+user.last_name));
+                callSendAPI(genLocationMessage(senderID));
+                //callSendAPI(genImageMessage(senderID, "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=CoQBdwAAACsXyxeZv3xqFa1FTDIMyy4H2FU6EQowCKM9M18cBQDR0G_KFDV6bd5J_UH-rm0t6dhcKsu69x4H239Qj4Ni-LZpavESSo58X_bSibzlHDAgsdqBzyv6FCtptX72K25xU6xN7v1cKktwcVFCo-IAKfqfOBbtngjuLaCx7U3OHghBEhBlgZHlsLemXLA6F7cF-n_JGhTpel0M9s5wTaSGfKpdcYaGUBjE9w&key=AIzaSyB_AjPMcqwoEZtcB_EJouqH0MJfFUg6vls"));
             });
         }
 
     } else if (messageAttachments) {
+        console.log(messageAttachments);
         callSendAPI(genTextMessage(senderID, "Message with attachment received"));
     }
 }
@@ -130,7 +133,22 @@ function genImageMessage(recipientId, imageUrl) {
             }
         }
     };
+    return messageData;
+}
 
+function genLocationMessage(recipientId) {
+    var messageData = {
+        recipient: {
+            id: recipientId
+        },
+        message: {
+            text: "Donner votre position:",
+            quick_replies: [
+            {
+                content_type:"location"
+            }]
+        }
+    };
     return messageData;
 }
 
