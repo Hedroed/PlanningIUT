@@ -15,6 +15,7 @@
     "moment": "^2.17.1",
     "morgan": "~1.7.0",
     "node-sass-middleware": "0.9.8",
+    "request": "^2.79.0",
     "serve-favicon": "~2.3.0",
     "xmlreader": "^0.2.3"
   }

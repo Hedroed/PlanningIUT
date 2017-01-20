@@ -3,4 +3,6 @@
 /public/stylesheets/**/*.css.map
 /**/npm-debug.log
 
+/bin
+
 *.pem

@@ -55,55 +55,63 @@ router.post('/', function (req, res) {
   }
 });
 
-var courseRegex = new RegExp('^cours ([1,2][A-D][1,2])$', 'i');
+var askList = ["Bonjour", "Commerce", "Merci", "Aide"];
+
+//Ask detection
+var helloRG = new RegExp("(bonjour)|(salut)|(salutation)|(yo)","i");
+var shopRG = new RegExp("(commerce)|(magasin)","i");
+var locationRG = new RegExp("^(\\d{1,2}(?:\.?\\d+))\\s*,\\s*(-?\\d{1,3}(?:\.?\\d+))$");
+var thankRG = new RegExp("merci","i");
+var helpRG = new RegExp("(help)|(aide)|(aidez-moi)","i");
+
+//postback
+var shopPB = "shop";
+var detailPB = "detail";
+
 function receivedMessage(event, req) {
     var senderID = event.sender.id;
     var timeOfMessage = event.timestamp;
-    var message = event.message;
-    console.log("Received for user %d at %s msg : %s",
-    senderID, moment(+timeOfMessage).format('lll'), message.text);
+    console.log("Received for user %d at %s", senderID, moment(+timeOfMessage).format('lll'));
 
-    var messageText = message.text;
-    var messageAttachments = message.attachments;
+    if(event.message) {
+        var message = event.message;
+        var messageText = message.text;
+        var messageAttachments = message.attachments;
 
-    if (messageText) {
-        var match = courseRegex.exec(messageText);
-        if(match) {
-            //parse group
-            var param = match[1];
-            var paramInfo = param.substring(0,1);
-            var paramGroup = param.substring(1);
-            var group = [param, param.substring(0,param.length-1), paramInfo];
-            //console.log(group);
-            var plan = paramInfo === "1" ? req.planInfo1 : req.planInfo2;
-            var courses = plan.getCourses(group, false, 1);
-            //console.log(courses);
-            
-            if(courses[0]) {
-                var course = courses[0];
-                var ret = "";
-                ret += "Prochain : "+course.name+"\n";
-                ret += moment(+course.start).format('lll')+" - "+moment(+course.end).format('lll')+"\n";
-                ret += "en "+course.location+" avec "+course.description;            
-                
-                callSendAPI(genTextMessage(senderID, ret));
-            } else {
-                callSendAPI(genTextMessage(senderID, "Pas de cours :)"));
-            }
+        if (messageText) {
+            // Reception d'un message text de l'utilisateur
+            console.log("Type : msg");
 
-        } else {
+            // reconnaissance du texte du message avec des regex
+
+
             getUserInfo(senderID, (user)=>{
                 var title = (user.gender === "male" ? "Mr":"Mme");
-                //callSendAPI(genTextMessage(senderID, "Bonjour "+title+" "+user.first_name+" "+user.last_name));
-                callSendAPI(genLocationMessage(senderID));
-                //callSendAPI(genImageMessage(senderID, "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=CoQBdwAAACsXyxeZv3xqFa1FTDIMyy4H2FU6EQowCKM9M18cBQDR0G_KFDV6bd5J_UH-rm0t6dhcKsu69x4H239Qj4Ni-LZpavESSo58X_bSibzlHDAgsdqBzyv6FCtptX72K25xU6xN7v1cKktwcVFCo-IAKfqfOBbtngjuLaCx7U3OHghBEhBlgZHlsLemXLA6F7cF-n_JGhTpel0M9s5wTaSGfKpdcYaGUBjE9w&key=AIzaSyB_AjPMcqwoEZtcB_EJouqH0MJfFUg6vls"));
+                // genTextMessage(senderID, "Bonjour "+title+" "+user.first_name+" "+user.last_name);
+                // setTimeout(()=>{genLocationMessage(senderID)},100);
+                // genPlaceMessage(senderID, {})
             });
+
+        } else if (messageAttachments) {
+            //Reception d'un message piece jointe
+            //Potentiellement les coordonées de l'utilisateur via Messenger
+
+            console.log("Type : attachment");
+            console.log(message);
+            // genTextMessage(senderID, "Message with attachment received");
         }
 
-    } else if (messageAttachments) {
-        console.log(messageAttachments);
-        callSendAPI(genTextMessage(senderID, "Message with attachment received"));
+    } else if(event.postback){
+        //reception d'un click de bouton postback "plus de detail" ou "commerce"
+
+        var postback = event.postback;
+        console.log("Type : postback");
+
+    } else {
+        //message inconnu, proposition des message pertinent
+        genQuickReplies(senderID, askList);
     }
+
 }
 
 function genTextMessage(recipientId, messageText) {
@@ -116,7 +124,109 @@ function genTextMessage(recipientId, messageText) {
         }
     };
 
-    return messageData;
+    callSendAPI(messageData);
+}
+
+function genPlacesListMessage(recipientId, places) {
+
+    var elems = [];
+    for(place in places) {
+        elems.push({
+            title: place.name,
+            image_url: place.photoUrl,
+            subtitle: place.address,
+            default_action: {
+                type: "web_url",
+                url: place.mapUrl,
+                webview_height_ratio: "tall",
+                // messenger_extensions: true,
+                // fallback_url: "https://peterssendreceiveapp.ngrok.io/"
+            },
+            buttons: [
+                {
+                    title: "Plus de détails",
+                    type: "postback",
+                    payload: place.id
+                }
+            ]
+        });
+    }
+
+    var messageData = {
+        recipient: {
+            id: recipientId
+        },
+        message: {
+            attachment: {
+                type: "template",
+                payload: {
+                    template_type: "list",
+                    top_element_style: "compact",
+                    elements: elems,
+                    buttons: [
+                        {
+                            title: "View More",
+                            type: "postback",
+                            payload: "payload"
+                        }
+                    ]
+                }
+            }
+        }
+    };
+
+    callSendAPI(messageData);
+}
+
+function genPlaceMessage(recipientId, place, userLocation) {
+    var openState = place.openNow ? "Actuellement ouvert" : "Fermer";
+
+    var messageData = {
+        recipient: {
+            id: recipientId
+        },
+        message: {
+            attachment: {
+                type: "template",
+                payload: {
+                    template_type: "generic",
+                    elements: [
+                        {
+                            title: place.name,
+                            image_url: place.photoUrl,
+                            subtitle: place.address+", "+openState+", "+place.distance(userLocation.lat, userLocation.lng),
+                            default_action: {
+                                type: "web_url",
+                                url: place.mapUrl,
+                                webview_height_ratio: "tall",
+                                // messenger_extensions: true,
+                                // fallback_url: "https://peterssendreceiveapp.ngrok.io/"
+                            },
+                            buttons: [
+                                {
+                                    type: "web_url",
+                                    url: place.mapUrl,
+                                    title: "Voir sur Maps"
+                                },
+                                {
+                                    title: "Téléphoner",
+                                    type: "phone_number",
+                                    payload: place.phone
+                                },
+                                {
+                                    type: "web_url",
+                                    url: place.website,
+                                    title: "Site Web"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    };
+
+    callSendAPI(messageData);
 }
 
 function genImageMessage(recipientId, imageUrl) {
@@ -133,7 +243,7 @@ function genImageMessage(recipientId, imageUrl) {
             }
         }
     };
-    return messageData;
+    callSendAPI(messageData);
 }
 
 function genLocationMessage(recipientId) {
@@ -149,7 +259,41 @@ function genLocationMessage(recipientId) {
             }]
         }
     };
-    return messageData;
+    callSendAPI(messageData);
+}
+
+function genQuickReplies(recipientId, texts) {
+    var replies = [];
+    for(text in texts) {
+        replies.push({
+          content_type:"text",
+          title: text,
+          payload:"quick_replies"
+        });
+    }
+
+    var messageData = {
+        recipient: {
+            id: recipientId
+        },
+        message: {
+            text:"Qu'avez vous voulu dire ?",
+            quick_replies:replies
+        }
+    };
+
+    callSendAPI(messageData);
+}
+
+function genTypingOn(recipientId, messageText) {
+    var messageData = {
+        recipient: {
+            id: recipientId
+        },
+        sender_action: "typing_on"
+    };
+
+    callSendAPI(messageData);
 }
 
 function callSendAPI(messageData) {
