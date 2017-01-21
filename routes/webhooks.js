@@ -48,6 +48,10 @@ router.post('/', function (req, res) {
             entry.messaging.forEach(function(event) {
                 receivedMessage(event, req);
             });
+            if(entry.messaging.length == 0){
+                console.log("No message entry");
+                console.log(entry);
+            }
         });
 
         // Assume all went well.
@@ -107,7 +111,6 @@ function receivedMessage(event, req) {
                         var phUrl = api.getPlacePhoto(nearPlaces[i].photos[0].photo_reference);
                         displayPlaces.push(new places.Place(nearPlaces[i].place_id, nearPlaces[i].name, nearPlaces[i].geometry.location.lat, nearPlaces[i].geometry.location.lng, nearPlaces[i].vicinity, nearPlaces[i].opening_hours.open_now, phUrl));
                     }
-                    console.log(displayPlaces);
                     genPlacesListMessage(senderID, displayPlaces);
                 });
 
@@ -176,7 +179,7 @@ function genPlacesListMessage(recipientId, places, cb) {
             subtitle: place.address,
             default_action: {
                 type: "web_url",
-                url: "#",
+                url: "http://planningiut.fr",
                 messenger_extensions: false,
                 webview_height_ratio: "tall"
             },
@@ -212,7 +215,6 @@ function genPlacesListMessage(recipientId, places, cb) {
             }
         }
     };
-    // console.log(messageData);
 
     callSendAPI(messageData, cb);
 }
