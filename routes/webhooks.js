@@ -283,6 +283,7 @@ function genPlaceMessage(recipientId, place, userLocation, cb) {
         }
     };
 
+    console.log(messageData);
     callSendAPI(messageData, cb);
 }
 

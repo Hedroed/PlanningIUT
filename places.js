@@ -60,6 +60,7 @@ PlacesApi.prototype.nearby = function(param, cb) {
 }
 
 PlacesApi.prototype.getPlaceInfos = function(placeId, cb) {
+    var self = this;
     request({
         uri: "https://maps.googleapis.com/maps/api/place/details/json",
         qs: {
@@ -73,7 +74,7 @@ PlacesApi.prototype.getPlaceInfos = function(placeId, cb) {
             body = JSON.parse(body);
             if(body.result) {
                 res = body.result;
-                var phUrl = getPlacePhoto(res.photos[0].photo_reference);
+                var phUrl = self.getPlacePhoto(res.photos[0].photo_reference);
                 if(cb) cb(new Place(res.place_id, res.name, res.geometry.location.lat, res.geometry.location.lng, res.formatted_address, res.opening_hours.open_now, phUrl, res.international_phone_number, res.url, res.website));
             } else {
                 console.log("Response error");
