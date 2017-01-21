@@ -13,7 +13,7 @@ PlacesApi.prototype.radar = function(param, cb) {
     request({
         uri: "https://maps.googleapis.com/maps/api/place/radarsearch/json",
         qs: {
-            location: param.lat+","+param.long,
+            location: param.lat+","+param.lng,
             radius: 500,
             types: param.types,
             key: this.key
@@ -38,7 +38,7 @@ PlacesApi.prototype.nearby = function(param, cb) {
     request({
         uri: "https://maps.googleapis.com/maps/api/place/nearbysearch/json",
         qs: {
-            location: param.lat+","+param.long,
+            location: param.lat+","+param.lng,
             radius: 500,
             types: param.types,
             key: this.key

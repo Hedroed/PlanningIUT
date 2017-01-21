@@ -11,7 +11,7 @@ var API_KEY = "AIzaSyB_AjPMcqwoEZtcB_EJouqH0MJfFUg6vls";
 
 var param = {
     lat: 48.809362, //The Machinery location
-    long: 2.365064,
+    lng: 2.365064,
     types: "food|cafe|bakery|restaurant|bar"
 };
 
@@ -145,7 +145,7 @@ function receivedMessage(event, req) {
             var placeId = detailPB.exec(postback.payload)[1];
             console.log("place "+placeId);
             var placeDetail = api.getPlaceInfos(placeId);
-            genPlaceMessage(senderID, placeDetail);
+            genPlaceMessage(senderID, placeDetail, param);
 
         } else {
             genQuickReplies(senderID, "Qu'avez vous voulu dire ?", askList);
