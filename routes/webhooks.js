@@ -79,17 +79,33 @@ function receivedMessage(event, req) {
             console.log("Type : msg");
 
             // reconnaissance du texte du message avec des regex
-
-
-            getUserInfo(senderID, (user)=>{
-                console.log("send greeting");
-                var title = (user.gender === "male" ? "Mr":"Mme");
-                genTextMessage(senderID, "Bonjour "+title+" "+user.first_name+" "+user.last_name, ()=>{
-                    genQuickReplies(senderID, askList);
+            if(helloRG.test(messageText) {
+                getUserInfo(senderID, (user)=>{
+                    console.log("send greeting");
+                    var title = (user.gender === "male" ? "Mr":"Mme");
+                    genTextMessage(senderID, "Bonjour "+title+" "+user.first_name+" "+user.last_name, ()=>{
+                        genQuickReplies(senderID, "Demandez moi quelque chose:", askList);
+                    });
                 });
+            } else if(shopRG.test(messageText)) {
+                genTextMessage(senderID, "Pas ci vite mon petit kinder");
                 // genLocationMessage(senderID);
                 // genPlaceMessage(senderID, {})
-            });
+
+            } else if(helpRG.test(messageText)) {
+                genQuickReplies(senderID, "Je peux vous montré les commerces proche de vous: ", ["Commerce"]);
+
+            } else if(thankRG.test(messageText)) {
+                genTextMessage(senderID, "Se fut un plaisir de discuter avec vous");
+            } else if(locationRG.test(messageText)) {
+                var ret = locationRG.exec(messageText);
+                var lat = ret[1];
+                var lng = ret[2];
+                console.log("New location %s, %s", lat, lng);
+                genTextMessage(senderID, "Vous êtes en "+lat+", "+lng);
+            } else {
+                genQuickReplies(senderID, "Qu'avez vous voulu dire ?", askList);
+            }
 
         } else if (messageAttachments) {
             //Reception d'un message piece jointe
@@ -109,7 +125,7 @@ function receivedMessage(event, req) {
     } else {
         //message inconnu, proposition des message pertinent
         console.log("quick replies");
-        genQuickReplies(senderID, askList);
+        genQuickReplies(senderID, "Qu'avez vous voulu dire ?", askList);
     }
 
 }
@@ -262,7 +278,7 @@ function genLocationMessage(recipientId, cb) {
     callSendAPI(messageData, cb);
 }
 
-function genQuickReplies(recipientId, texts, cb) {
+function genQuickReplies(recipientId, title, texts, cb) {
     var replies = [];
     for(text of texts) {
         replies.push({
@@ -277,7 +293,7 @@ function genQuickReplies(recipientId, texts, cb) {
             id: recipientId
         },
         message: {
-            text:"Qu'avez vous voulu dire ?",
+            text: title,
             quick_replies:replies
         }
     };
