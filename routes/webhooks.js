@@ -144,9 +144,9 @@ function receivedMessage(event, req) {
             console.log("postback detail");
             var placeId = detailPB.exec(postback.payload)[1];
             console.log("place "+placeId);
-            var placeDetail = api.getPlaceInfos(placeId);
-            console.log("test1");
-            genPlaceMessage(senderID, placeDetail, param);
+            var placeDetail = api.getPlaceInfos(placeId, (placeDetail)=>{
+                genPlaceMessage(senderID, placeDetail, param);
+            });
 
         } else {
             genQuickReplies(senderID, "Qu'avez vous voulu dire ?", askList);
@@ -238,7 +238,6 @@ function genPlacesListMessage(recipientId, places, cb) {
 
 function genPlaceMessage(recipientId, place, userLocation, cb) {
     var openState = place.openNow ? "Actuellement ouvert" : "Fermer";
-    console.log("test1");
 
     var messageData = {
         recipient: {
@@ -284,9 +283,6 @@ function genPlaceMessage(recipientId, place, userLocation, cb) {
             }
         }
     };
-    console.log("test1");
-
-    console.log(messageData);
     callSendAPI(messageData, cb);
 }
 
