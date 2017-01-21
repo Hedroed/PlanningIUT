@@ -72,7 +72,7 @@ var helpRG = new RegExp("(help)|(aide)|(aidez-moi)","i");
 var shopPB = "shop";
 var detailPB = "detail";
 
-var api = new place.PlacesApi(API_KEY);
+var api = new places.PlacesApi(API_KEY);
 
 function receivedMessage(event, req) {
     var senderID = event.sender.id;
@@ -175,9 +175,10 @@ function genPlacesListMessage(recipientId, places, cb) {
             image_url: place.photoUrl,
             subtitle: place.address,
             default_action: {
-                title: "Plus de détails",
-                type: "postback",
-                payload: place.id
+                type: "web_url",
+                url: "#",
+                messenger_extensions: false,
+                webview_height_ratio: "tall"
             },
             buttons: [
                 {
