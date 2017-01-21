@@ -1,8 +1,4 @@
-var express = require('express');
-var router = express.Router();
 var request = require('request');
-var moment = require('moment');
-moment.locale("fr");
 
 //polyfill
 Number.prototype.toRadians = function() {
@@ -11,11 +7,7 @@ Number.prototype.toRadians = function() {
 
 var API_KEY = "AIzaSyB_AjPMcqwoEZtcB_EJouqH0MJfFUg6vls";
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-
-    var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    console.log(ip);
+function test() {
 
     var param = {
         lat: 48.809362,
@@ -32,10 +24,17 @@ router.get('/', function(req, res, next) {
         }
     });
 
-    res.sendStatus(200);
-});
+    nearby(param, (e)=>{
+        e.forEach((elem)=>{
+            var phUrl = getPlacePhoto(elem.photos[0].photo_reference);
+            var place = new Place(elem.place_id, elem.name, elem.location.lat, elem.location.lng, elem.vicinity, elem.opening_hours.open_now, phUrl);
+        });
+    });
 
-function radar(param, cb) {
+    res.sendStatus(200);
+}
+
+var radar = function(param, cb) {
     request({
         uri: "https://maps.googleapis.com/maps/api/place/radarsearch/json",
         qs: {
@@ -60,7 +59,32 @@ function radar(param, cb) {
     });
 }
 
-function getPlaceInfos(placeId, cb) {
+var nearby = function(param, cb) {
+    request({
+        uri: "https://maps.googleapis.com/maps/api/place/nearbysearch/json",
+        qs: {
+            location: param.lat+","+param.long,
+            radius: 500,
+            types: param.types,
+            key: API_KEY
+        },
+        method: 'GET'
+    }, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            console.log("ok");
+            body = JSON.parse(body);
+
+            if(cb) cb(body.results);
+
+        } else {
+            console.error("Unable to acess API.");
+            console.error(response);
+            console.error(error);
+        }
+    });
+}
+
+var getPlaceInfos = function(placeId, cb) {
     request({
         uri: "https://maps.googleapis.com/maps/api/place/details/json",
         qs: {
@@ -75,7 +99,7 @@ function getPlaceInfos(placeId, cb) {
             if(body.result) {
                 res = body.result;
                 var phUrl = getPlacePhoto(res.photos[0].photo_reference);
-                if(cb) cb(new Place(res.id, res.name, res.geometry.location.lat, res.geometry.location.lng, res.formatted_address, res.opening_hours.open_now, res.international_phone_number, phUrl, res.url, res.website));
+                if(cb) cb(new Place(res.place_id, res.name, res.geometry.location.lat, res.geometry.location.lng, res.formatted_address, res.opening_hours.open_now, res.international_phone_number, phUrl, res.url, res.website));
             } else {
                 console.log("Response error");
             }
@@ -88,12 +112,45 @@ function getPlaceInfos(placeId, cb) {
     });
 }
 
-function getPlacePhoto(reference) {
-        return "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference="+reference+"&key="+API_KEY;
+var updatePlaceInfos = function(place, cb) {
+    request({
+        uri: "https://maps.googleapis.com/maps/api/place/details/json",
+        qs: {
+            placeid: place.id,
+            key: API_KEY
+        },
+        method: 'GET'
+    }, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            console.log("ok");
+            body = JSON.parse(body);
+            if(body.result) {
+                res = body.result;
 
+                place.phone = res.international_phone_number;
+                place.mapUrl = res.url;
+                place.website = res.website;
+                place.address = res.formatted_address;
+
+                if(cb) cb(place);
+            } else {
+                console.log("Response error");
+            }
+
+        } else {
+            console.error("Unable to acess API.");
+            console.error(response);
+            console.error(error);
+        }
+    });
 }
 
-var Place = function(id, name, lat, long, address, isOpen, phone, photoUrl, mapUrl, website) {
+var getPlacePhoto = function(reference) {
+    return "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference="+reference+"&key="+API_KEY;
+}
+
+//Place object class
+var Place = function(id, name, lat, long, address, isOpen, photoUrl, phone, mapUrl, website) {
     this.id = id;
     this.name = name;
     this.lat = lat;
@@ -122,4 +179,6 @@ Place.prototype.distance = function (latitude, longitude) {
     return d;
 };
 
-module.exports = router;
+module.exports = {Place: Place, PlacesApi: {radar: radar, nearby: nearby, getPlaceInfos: getPlaceInfos, updatePlaceInfos: updatePlaceInfos, getPlacePhoto: getPlacePhoto}};
+
+test();

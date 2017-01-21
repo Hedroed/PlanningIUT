@@ -4,8 +4,15 @@ var Planning = require('../planning');
 var moment = require('moment');
 moment.locale("fr");
 var request = require('request');
+var places = require('../places');
 
 var token = "EAAFq1GqUrIEBAELUVuua4YsHKChnbFZBip0ZAPIJbEh9bOIalrXqjVDib9YGvDg7h36VQfopGRswSoCDabRa6QCE0XoGZADfDjwOojwptzSyK4Y9OFmWGuMl2btW8ZBZAW6hj5UGz1QZBMK6TOpVYebFH2LIPX3EdOj5afYKicTAZDZD";
+
+var param = {
+    lat: 48.809362, //The Machinery location
+    long: 2.365064,
+    types: "food|cafe|bakery|restaurant|bar"
+};
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -68,6 +75,7 @@ function receivedMessage(event, req) {
     var senderID = event.sender.id;
     var timeOfMessage = event.timestamp;
     console.log("Received for user %d at %s", senderID, moment(+timeOfMessage).format('lll'));
+    genTypingOn(senderID);
 
     if(event.message) {
         var message = event.message;
@@ -79,7 +87,7 @@ function receivedMessage(event, req) {
             console.log("Type : msg");
 
             // reconnaissance du texte du message avec des regex
-            if(helloRG.test(messageText) {
+            if(helloRG.test(messageText)) {
                 getUserInfo(senderID, (user)=>{
                     console.log("send greeting");
                     var title = (user.gender === "male" ? "Mr":"Mme");
@@ -88,7 +96,18 @@ function receivedMessage(event, req) {
                     });
                 });
             } else if(shopRG.test(messageText)) {
-                genTextMessage(senderID, "Pas ci vite mon petit kinder");
+                // genTextMessage(senderID, "Pas ci vite mon petit kinder");
+
+                places.PlacesApi.nearby(param, (nearPlaces)=>{
+                    displayPlaces = [];
+                    for(var i=0; i<4;i++){
+                        var phUrl = getPlacePhoto(nearPlaces[i].photos[0].photo_reference);
+                        displayPlaces.push(new Place(nearPlaces[i].place_id, nearPlaces[i].name, nearPlaces[i].location.lat, nearPlaces[i].location.lng, nearPlaces[i].vicinity, nearPlaces[i].opening_hours.open_now, phUrl));
+                    }
+
+                    genPlacesListMessage(senderID, displayPlaces);
+                });
+
                 // genLocationMessage(senderID);
                 // genPlaceMessage(senderID, {})
 
@@ -144,7 +163,8 @@ function genTextMessage(recipientId, messageText, cb) {
 }
 
 function genPlacesListMessage(recipientId, places, cb) {
-
+    if(places.length > 4) throw "Too many places max is 4";
+    
     var elems = [];
     for(place of places) {
         elems.push({
@@ -152,11 +172,9 @@ function genPlacesListMessage(recipientId, places, cb) {
             image_url: place.photoUrl,
             subtitle: place.address,
             default_action: {
-                type: "web_url",
-                url: place.mapUrl,
-                webview_height_ratio: "tall",
-                // messenger_extensions: true,
-                // fallback_url: "https://peterssendreceiveapp.ngrok.io/"
+                title: "Plus de détails",
+                type: "postback",
+                payload: place.id
             },
             buttons: [
                 {
@@ -301,7 +319,7 @@ function genQuickReplies(recipientId, title, texts, cb) {
     callSendAPI(messageData, cb);
 }
 
-function genTypingOn(recipientId, messageText) {
+function genTypingOn(recipientId) {
     var messageData = {
         recipient: {
             id: recipientId
