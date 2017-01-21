@@ -84,8 +84,10 @@ function receivedMessage(event, req) {
             getUserInfo(senderID, (user)=>{
                 console.log("send greeting");
                 var title = (user.gender === "male" ? "Mr":"Mme");
-                // genTextMessage(senderID, "Bonjour "+title+" "+user.first_name+" "+user.last_name);
-                // setTimeout(()=>{genLocationMessage(senderID)},100);
+                genTextMessage(senderID, "Bonjour "+title+" "+user.first_name+" "+user.last_name, ()=>{
+                    genQuickReplies(senderID, askList);
+                });
+                // genLocationMessage(senderID);
                 // genPlaceMessage(senderID, {})
             });
 
@@ -112,7 +114,7 @@ function receivedMessage(event, req) {
 
 }
 
-function genTextMessage(recipientId, messageText) {
+function genTextMessage(recipientId, messageText, cb) {
     var messageData = {
         recipient: {
             id: recipientId
@@ -122,13 +124,13 @@ function genTextMessage(recipientId, messageText) {
         }
     };
 
-    callSendAPI(messageData);
+    callSendAPI(messageData, cb);
 }
 
-function genPlacesListMessage(recipientId, places) {
+function genPlacesListMessage(recipientId, places, cb) {
 
     var elems = [];
-    for(place in places) {
+    for(place of places) {
         elems.push({
             title: place.name,
             image_url: place.photoUrl,
@@ -173,10 +175,10 @@ function genPlacesListMessage(recipientId, places) {
         }
     };
 
-    callSendAPI(messageData);
+    callSendAPI(messageData, cb);
 }
 
-function genPlaceMessage(recipientId, place, userLocation) {
+function genPlaceMessage(recipientId, place, userLocation, cb) {
     var openState = place.openNow ? "Actuellement ouvert" : "Fermer";
 
     var messageData = {
@@ -224,10 +226,10 @@ function genPlaceMessage(recipientId, place, userLocation) {
         }
     };
 
-    callSendAPI(messageData);
+    callSendAPI(messageData, cb);
 }
 
-function genImageMessage(recipientId, imageUrl) {
+function genImageMessage(recipientId, imageUrl, cb) {
     var messageData = {
         recipient: {
             id: recipientId
@@ -241,10 +243,10 @@ function genImageMessage(recipientId, imageUrl) {
             }
         }
     };
-    callSendAPI(messageData);
+    callSendAPI(messageData, cb);
 }
 
-function genLocationMessage(recipientId) {
+function genLocationMessage(recipientId, cb) {
     var messageData = {
         recipient: {
             id: recipientId
@@ -257,12 +259,12 @@ function genLocationMessage(recipientId) {
             }]
         }
     };
-    callSendAPI(messageData);
+    callSendAPI(messageData, cb);
 }
 
-function genQuickReplies(recipientId, texts) {
+function genQuickReplies(recipientId, texts, cb) {
     var replies = [];
-    for(text in texts) {
+    for(text of texts) {
         replies.push({
           content_type:"text",
           title: text,
@@ -280,7 +282,7 @@ function genQuickReplies(recipientId, texts) {
         }
     };
 
-    callSendAPI(messageData);
+    callSendAPI(messageData, cb);
 }
 
 function genTypingOn(recipientId, messageText) {
@@ -294,7 +296,7 @@ function genTypingOn(recipientId, messageText) {
     callSendAPI(messageData);
 }
 
-function callSendAPI(messageData) {
+function callSendAPI(messageData, cb) {
   request({
     uri: 'https://graph.facebook.com/v2.6/me/messages',
     qs: { access_token: token },
@@ -308,6 +310,7 @@ function callSendAPI(messageData) {
 
       console.log("Successfully sent message id %s to %s",
         messageId, recipientId);
+        if(cb) cb();
     } else {
       console.error("Unable to send message.");
       console.error(response);
