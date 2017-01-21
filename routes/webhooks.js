@@ -73,8 +73,8 @@ var thankRG = new RegExp("merci","i");
 var helpRG = new RegExp("(help)|(aide)|(aidez-moi)","i");
 
 //postback
-var shopPB = "shop";
-var detailPB = "detail";
+var shopPB = new RegExp("shop");
+var detailPB = new RegExp("detail:(.*)");
 
 var api = new places.PlacesApi(API_KEY);
 
@@ -104,18 +104,8 @@ function receivedMessage(event, req) {
                 });
             } else if(shopRG.test(messageText)) {
                 // genTextMessage(senderID, "Pas ci vite mon petit kinder");
-
-                api.nearby(param, (nearPlaces)=>{
-                    displayPlaces = [];
-                    for(var i=0; i<4;i++){
-                        var phUrl = api.getPlacePhoto(nearPlaces[i].photos[0].photo_reference);
-                        displayPlaces.push(new places.Place(nearPlaces[i].place_id, nearPlaces[i].name, nearPlaces[i].geometry.location.lat, nearPlaces[i].geometry.location.lng, nearPlaces[i].vicinity, nearPlaces[i].opening_hours.open_now, phUrl));
-                    }
-                    genPlacesListMessage(senderID, displayPlaces);
-                });
-
+                shopInfo();
                 // genLocationMessage(senderID);
-                // genPlaceMessage(senderID, {})
 
             } else if(helpRG.test(messageText)) {
                 genQuickReplies(senderID, "Je peux vous montré les commerces proche de vous: ", ["Commerce"]);
@@ -143,14 +133,39 @@ function receivedMessage(event, req) {
 
     } else if(event.postback){
         //reception d'un click de bouton postback "plus de detail" ou "commerce"
-
-        var postback = event.postback;
         console.log("Type : postback");
+        var postback = event.postback;
+
+        if(shopPB.test(postback.payload)) {
+            console.log("postback shop");
+            shopInfo();
+
+        } else if(detailPB.test(postback.payload)) {
+            console.log("postback detail");
+            var placeId = detailPB.exec(postback.payload)[1];
+            console.log("place "+placeId);
+            var placeDetail = api.getPlaceInfos(placeId);
+            genPlaceMessage(senderID, placeDetail);
+
+        } else {
+            genQuickReplies(senderID, "Qu'avez vous voulu dire ?", askList);
+        }
 
     } else {
         //message inconnu, proposition des message pertinent
         console.log("quick replies");
         genQuickReplies(senderID, "Qu'avez vous voulu dire ?", askList);
+    }
+
+    function shopInfo() {
+        api.nearby(param, (nearPlaces)=>{
+            displayPlaces = [];
+            for(var i=0; i<4;i++){
+                var phUrl = api.getPlacePhoto(nearPlaces[i].photos[0].photo_reference);
+                displayPlaces.push(new places.Place(nearPlaces[i].place_id, nearPlaces[i].name, nearPlaces[i].geometry.location.lat, nearPlaces[i].geometry.location.lng, nearPlaces[i].vicinity, nearPlaces[i].opening_hours.open_now, phUrl));
+            }
+            genPlacesListMessage(senderID, displayPlaces);
+        });
     }
 
 }
@@ -187,7 +202,7 @@ function genPlacesListMessage(recipientId, places, cb) {
                 {
                     title: "Plus de détails",
                     type: "postback",
-                    payload: place.id
+                    payload: "detail:"+place.id
                 }
             ]
         });
@@ -203,14 +218,15 @@ function genPlacesListMessage(recipientId, places, cb) {
                 payload: {
                     template_type: "list",
                     top_element_style: "compact",
-                    elements: elems,
-                    buttons: [
-                        {
-                            title: "View More",
-                            type: "postback",
-                            payload: "payload"
-                        }
-                    ]
+                    elements: elems
+                    // ,
+                    // buttons: [
+                    //     {
+                    //         title: "View More",
+                    //         type: "postback",
+                    //         payload: "payload"
+                    //     }
+                    // ]
                 }
             }
         }
