@@ -72,7 +72,7 @@ var helpRG = new RegExp("(help)|(aide)|(aidez-moi)","i");
 var shopPB = "shop";
 var detailPB = "detail";
 
-var api = place.PlacesApi(API_KEY);
+var api = new place.PlacesApi(API_KEY);
 
 function receivedMessage(event, req) {
     var senderID = event.sender.id;
@@ -105,7 +105,7 @@ function receivedMessage(event, req) {
                     displayPlaces = [];
                     for(var i=0; i<4;i++){
                         var phUrl = api.getPlacePhoto(nearPlaces[i].photos[0].photo_reference);
-                        displayPlaces.push(new place.Place(nearPlaces[i].place_id, nearPlaces[i].name, nearPlaces[i].location.lat, nearPlaces[i].location.lng, nearPlaces[i].vicinity, nearPlaces[i].opening_hours.open_now, phUrl));
+                        displayPlaces.push(new places.Place(nearPlaces[i].place_id, nearPlaces[i].name, nearPlaces[i].geometry.location.lat, nearPlaces[i].geometry.location.lng, nearPlaces[i].vicinity, nearPlaces[i].opening_hours.open_now, phUrl));
                     }
                     console.log(displayPlaces);
                     genPlacesListMessage(senderID, displayPlaces);
@@ -211,7 +211,7 @@ function genPlacesListMessage(recipientId, places, cb) {
             }
         }
     };
-    console.log(messageData);
+    // console.log(messageData);
 
     callSendAPI(messageData, cb);
 }

@@ -5,7 +5,7 @@ Number.prototype.toRadians = function() {
    return this * Math.PI / 180;
 }
 
-var PacesApi = function(key) {
+var PlacesApi = function(key) {
     this.key = key;
 }
 
