@@ -7,6 +7,7 @@ var request = require('request');
 var places = require('../places');
 
 var token = "EAAFq1GqUrIEBAELUVuua4YsHKChnbFZBip0ZAPIJbEh9bOIalrXqjVDib9YGvDg7h36VQfopGRswSoCDabRa6QCE0XoGZADfDjwOojwptzSyK4Y9OFmWGuMl2btW8ZBZAW6hj5UGz1QZBMK6TOpVYebFH2LIPX3EdOj5afYKicTAZDZD";
+var API_KEY = "AIzaSyB_AjPMcqwoEZtcB_EJouqH0MJfFUg6vls";
 
 var param = {
     lat: 48.809362, //The Machinery location
@@ -71,6 +72,8 @@ var helpRG = new RegExp("(help)|(aide)|(aidez-moi)","i");
 var shopPB = "shop";
 var detailPB = "detail";
 
+var api = place.PlacesApi(API_KEY);
+
 function receivedMessage(event, req) {
     var senderID = event.sender.id;
     var timeOfMessage = event.timestamp;
@@ -98,13 +101,13 @@ function receivedMessage(event, req) {
             } else if(shopRG.test(messageText)) {
                 // genTextMessage(senderID, "Pas ci vite mon petit kinder");
 
-                places.PlacesApi.nearby(param, (nearPlaces)=>{
+                api.nearby(param, (nearPlaces)=>{
                     displayPlaces = [];
                     for(var i=0; i<4;i++){
-                        var phUrl = getPlacePhoto(nearPlaces[i].photos[0].photo_reference);
-                        displayPlaces.push(new Place(nearPlaces[i].place_id, nearPlaces[i].name, nearPlaces[i].location.lat, nearPlaces[i].location.lng, nearPlaces[i].vicinity, nearPlaces[i].opening_hours.open_now, phUrl));
+                        var phUrl = api.getPlacePhoto(nearPlaces[i].photos[0].photo_reference);
+                        displayPlaces.push(new place.Place(nearPlaces[i].place_id, nearPlaces[i].name, nearPlaces[i].location.lat, nearPlaces[i].location.lng, nearPlaces[i].vicinity, nearPlaces[i].opening_hours.open_now, phUrl));
                     }
-
+                    console.log(displayPlaces);
                     genPlacesListMessage(senderID, displayPlaces);
                 });
 
@@ -164,7 +167,7 @@ function genTextMessage(recipientId, messageText, cb) {
 
 function genPlacesListMessage(recipientId, places, cb) {
     if(places.length > 4) throw "Too many places max is 4";
-    
+
     var elems = [];
     for(place of places) {
         elems.push({
@@ -208,6 +211,7 @@ function genPlacesListMessage(recipientId, places, cb) {
             }
         }
     };
+    console.log(messageData);
 
     callSendAPI(messageData, cb);
 }

@@ -5,43 +5,18 @@ Number.prototype.toRadians = function() {
    return this * Math.PI / 180;
 }
 
-var API_KEY = "AIzaSyB_AjPMcqwoEZtcB_EJouqH0MJfFUg6vls";
-
-function test() {
-
-    var param = {
-        lat: 48.809362,
-        long: 2.365064,
-        types: "food|cafe|bakery|restaurant|bar"
-    };
-
-    radar(param, (e)=>{
-        for(var i=0; i<5;i++){
-            getPlaceInfos(e[i].place_id, (place)=>{
-                console.log(place);
-                console.log(place.distance(param.lat, param.long)+" m");
-            });
-        }
-    });
-
-    nearby(param, (e)=>{
-        e.forEach((elem)=>{
-            var phUrl = getPlacePhoto(elem.photos[0].photo_reference);
-            var place = new Place(elem.place_id, elem.name, elem.location.lat, elem.location.lng, elem.vicinity, elem.opening_hours.open_now, phUrl);
-        });
-    });
-
-    res.sendStatus(200);
+var PacesApi = function(key) {
+    this.key = key;
 }
 
-var radar = function(param, cb) {
+PlacesApi.prototype.radar = function(param, cb) {
     request({
         uri: "https://maps.googleapis.com/maps/api/place/radarsearch/json",
         qs: {
             location: param.lat+","+param.long,
             radius: 500,
             types: param.types,
-            key: API_KEY
+            key: this.key
         },
         method: 'GET'
     }, function (error, response, body) {
@@ -59,14 +34,14 @@ var radar = function(param, cb) {
     });
 }
 
-var nearby = function(param, cb) {
+PlacesApi.prototype.nearby = function(param, cb) {
     request({
         uri: "https://maps.googleapis.com/maps/api/place/nearbysearch/json",
         qs: {
             location: param.lat+","+param.long,
             radius: 500,
             types: param.types,
-            key: API_KEY
+            key: this.key
         },
         method: 'GET'
     }, function (error, response, body) {
@@ -84,12 +59,12 @@ var nearby = function(param, cb) {
     });
 }
 
-var getPlaceInfos = function(placeId, cb) {
+PlacesApi.prototype.getPlaceInfos = function(placeId, cb) {
     request({
         uri: "https://maps.googleapis.com/maps/api/place/details/json",
         qs: {
             placeid: placeId,
-            key: API_KEY
+            key: this.key
         },
         method: 'GET'
     }, function (error, response, body) {
@@ -112,12 +87,12 @@ var getPlaceInfos = function(placeId, cb) {
     });
 }
 
-var updatePlaceInfos = function(place, cb) {
+PlacesApi.prototype.updatePlaceInfos = function(place, cb) {
     request({
         uri: "https://maps.googleapis.com/maps/api/place/details/json",
         qs: {
             placeid: place.id,
-            key: API_KEY
+            key: this.key
         },
         method: 'GET'
     }, function (error, response, body) {
@@ -145,8 +120,8 @@ var updatePlaceInfos = function(place, cb) {
     });
 }
 
-var getPlacePhoto = function(reference) {
-    return "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference="+reference+"&key="+API_KEY;
+PlacesApi.prototype.getPlacePhoto = function(reference) {
+    return "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference="+reference+"&key="+this.key;
 }
 
 //Place object class
@@ -179,6 +154,36 @@ Place.prototype.distance = function (latitude, longitude) {
     return d;
 };
 
-module.exports = {Place: Place, PlacesApi: {radar: radar, nearby: nearby, getPlaceInfos: getPlaceInfos, updatePlaceInfos: updatePlaceInfos, getPlacePhoto: getPlacePhoto}};
+module.exports = {Place: Place, PlacesApi: PlacesApi};
 
-test();
+
+function test() {
+    var API_KEY = "AIzaSyB_AjPMcqwoEZtcB_EJouqH0MJfFUg6vls";
+
+    var param = {
+        lat: 48.809362,
+        long: 2.365064,
+        types: "food|cafe|bakery|restaurant|bar"
+    };
+
+    var api = new PlacesApi(API_KEY);
+
+    api.radar(param, (e)=>{
+        for(var i=0; i<5;i++){
+            this.getPlaceInfos(e[i].place_id, (place)=>{
+                console.log(place);
+                console.log(place.distance(param.lat, param.long)+" m");
+            });
+        }
+    });
+
+    api.nearby(param, (e)=>{
+        var self = this;
+        e.forEach((elem)=>{
+            var phUrl = self.getPlacePhoto(elem.photos[0].photo_reference);
+            var place = new Place(elem.place_id, elem.name, elem.location.lat, elem.location.lng, elem.vicinity, elem.opening_hours.open_now, phUrl);
+        });
+    });
+}
+
+//test();
