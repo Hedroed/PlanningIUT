@@ -15,7 +15,7 @@ PlacesApi.prototype.radar = function(param, cb) {
         qs: {
             location: param.lat+","+param.lng,
             radius: 500,
-            types: param.types,
+            types: "food|cafe|bakery|restaurant|bar",
             key: this.key
         },
         method: 'GET'
@@ -40,7 +40,7 @@ PlacesApi.prototype.nearby = function(param, cb) {
         qs: {
             location: param.lat+","+param.lng,
             radius: 500,
-            types: param.types,
+            types: "food|cafe|bakery|restaurant|bar",
             key: this.key
         },
         method: 'GET'
@@ -126,7 +126,7 @@ PlacesApi.prototype.getPlacePhoto = function(reference) {
 }
 
 PlacesApi.prototype.getMapUrl = function(place) {
-	return "https://www.google.com/maps/place/"+encodeURIComponent(place.id)+"/@"+place.lat+","+place.long+",17z/";
+	return "https://www.google.com/maps/place/"+encodeURIComponent(place.name)+"/@"+place.lat+","+place.long+",18z/";
 }
 
 //Place object class

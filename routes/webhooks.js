@@ -11,8 +11,7 @@ var API_KEY = "AIzaSyB_AjPMcqwoEZtcB_EJouqH0MJfFUg6vls";
 
 var param = {
     lat: 48.809362, //The Machinery location
-    lng: 2.365064,
-    types: "food|cafe|bakery|restaurant|bar"
+    lng: 2.365064  
 };
 
 /* GET home page. */
@@ -66,11 +65,11 @@ router.post('/', function (req, res) {
 var askList = ["Bonjour", "Commerce", "Merci", "Aide"];
 
 //Ask detection
-var helloRG = new RegExp("(bonjour)|(salut)|(salutation)|(yo)","i");
-var shopRG = new RegExp("(commerce)|(magasin)","i");
+var helloRG = new RegExp("(bonjour)|(salut)|(salutation)|(yo)|(slt)","i");
+var shopRG = new RegExp("(commerce)|(magasin)|(shop)","i");
 var locationRG = new RegExp("^(\\d{1,2}(?:\.?\\d+))\\s*,\\s*(-?\\d{1,3}(?:\.?\\d+))$");
 var thankRG = new RegExp("merci","i");
-var helpRG = new RegExp("(help)|(aide)|(aidez-moi)","i");
+var helpRG = new RegExp("(help)|(aide)|(aidez?-moi)","i");
 
 //postback
 var shopPB = new RegExp("shop");
@@ -240,11 +239,18 @@ function genPlaceMessage(recipientId, place, userLocation, cb) {
     var openState = place.openNow ? "Actuellement ouvert" : "Fermer";
 
     var buttons = [];
+    if(place.website) {
+        buttons.push({
+            type: "web_url",
+            url: place.website,
+            title: "Site Web"
+        });
+    }
     if(place.mapUrl) {
         buttons.push({
             type: "web_url",
             url: place.mapUrl,
-            title: "Voir sur Maps"
+            title: "Distance:"+place.distance(userLocation.lat, userLocation.lng)+"m"
         });
     }
     if(place.phone) {
@@ -252,13 +258,6 @@ function genPlaceMessage(recipientId, place, userLocation, cb) {
             title: "Téléphoner",
             type: "phone_number",
             payload: place.phone
-        });
-    }
-    if(place.website) {
-        buttons.push({
-            type: "web_url",
-            url: place.website,
-            title: "Site Web"
         });
     }
 
@@ -275,7 +274,7 @@ function genPlaceMessage(recipientId, place, userLocation, cb) {
                         {
                             title: place.name,
                             image_url: place.photoUrl,
-                            subtitle: place.address+", "+openState+", "+place.distance(userLocation.lat, userLocation.lng),
+                            subtitle: place.address+", "+openState,
                             default_action: {
                                 type: "web_url",
                                 url: place.mapUrl,
