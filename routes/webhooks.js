@@ -241,21 +241,21 @@ function genPlaceMessage(recipientId, place, userLocation, cb) {
 
     var buttons = [];
     if(place.mapUrl) {
-        button.push({
+        buttons.push({
             type: "web_url",
             url: place.mapUrl,
             title: "Voir sur Maps"
         });
     }
     if(place.phone) {
-        button.push({
+        buttons.push({
             title: "Téléphoner",
             type: "phone_number",
             payload: place.phone
         });
     }
     if(place.website) {
-        button.push({
+        buttons.push({
             type: "web_url",
             url: place.website,
             title: "Site Web"
@@ -283,7 +283,7 @@ function genPlaceMessage(recipientId, place, userLocation, cb) {
                                 // messenger_extensions: true,
                                 // fallback_url: "https://peterssendreceiveapp.ngrok.io/"
                             },
-                            buttons:
+                            buttons: buttons
                         }
                     ]
                 }
