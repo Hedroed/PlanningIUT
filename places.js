@@ -125,6 +125,10 @@ PlacesApi.prototype.getPlacePhoto = function(reference) {
     return "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference="+reference+"&key="+this.key;
 }
 
+PlacesApi.prototype.getMapUrl = function(place) {
+	return "https://www.google.com/maps/place/"+encodeURIComponent(place.id)+"/@"+place.lat+","+place.long+",17z/";
+}
+
 //Place object class
 var Place = function(id, name, lat, long, address, isOpen, photoUrl, phone, mapUrl, website) {
     this.id = id;

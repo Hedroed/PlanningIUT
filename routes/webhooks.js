@@ -195,7 +195,7 @@ function genPlacesListMessage(recipientId, places, cb) {
             subtitle: place.address,
             default_action: {
                 type: "web_url",
-                url: "http://planningiut.fr",
+                url: api.getMapUrl(place),
                 messenger_extensions: false,
                 webview_height_ratio: "tall"
             },
