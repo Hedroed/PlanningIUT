@@ -59,6 +59,29 @@ PlacesApi.prototype.nearby = function(param, cb) {
     });
 }
 
+PlacesApi.prototype.text = function(query, cb) {
+    request({
+        uri: "https://maps.googleapis.com/maps/api/place/textsearch/json",
+        qs: {
+            query: encodeURIComponent(query),
+            key: this.key
+        },
+        method: 'GET'
+    }, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            console.log("ok");
+            body = JSON.parse(body);
+
+            if(cb) cb(body.results);
+
+        } else {
+            console.error("Unable to acess API.");
+            console.error(response);
+            console.error(error);
+        }
+    });
+}
+
 PlacesApi.prototype.getPlaceInfos = function(placeId, cb) {
     var self = this;
     request({
