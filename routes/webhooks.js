@@ -64,7 +64,7 @@ router.post('/', function (req, res) {
     }
 });
 
-var askList = ["Bonjour", "Commerce", "Merci", "Aide"];
+var askList = ["Bonjour", "Commerce", "Merci", "Aide", "Localisation"];
 
 //Ask detection
 var helloRG = new RegExp("(bonjour)|(salut)|(salutation)|(yo)|(slt)","i");
@@ -72,6 +72,7 @@ var shopRG = new RegExp("(commerce)|(magasin)|(shop)","i");
 var locationRG = new RegExp("^(\\d{1,2}(?:\.?\\d+))\\s*,\\s*(-?\\d{1,3}(?:\.?\\d+))$");
 var thankRG = new RegExp("merci","i");
 var helpRG = new RegExp("(help)|(aide)|(aidez?-moi)","i");
+var newLocationRG = new RegExp("location|localisation","i");
 
 //postback
 var shopPB = new RegExp("shop");
@@ -105,7 +106,7 @@ function receivedMessage(event, req) {
                 });
             } else if(shopRG.test(messageText)) {
                 // genTextMessage(senderID, "Pas ci vite mon petit kinder");
-                shopInfo(senderId);
+                shopInfo(senderID);
 
             } else if(helpRG.test(messageText)) {
                 genQuickReplies(senderID, "Je peux vous montré les commerces proche de vous: ", ["Commerce"]);
@@ -117,11 +118,14 @@ function receivedMessage(event, req) {
                 var lat = ret[1];
                 var lng = ret[2];
                 console.log("New location %s, %s", lat, lng);
-                users[senderId].location.lat = +lat;
-                users[senderId].location.lng = +lng;
+                userLocation(senderID, lat, lng);
+                console.log(users[senderID]);
                 genTextMessage(senderID, "Vous êtes en "+lat+", "+lng);
-                shopInfo(senderId);
-
+                shopInfo(senderID);
+            
+            } else if(newLocationRG.test(messageText)) {
+                //console.log("new location "+senderID);
+                genLocationMessage(senderID);
             } else {
                 genQuickReplies(senderID, "Qu'avez vous voulu dire ?", askList);
             }
@@ -131,7 +135,13 @@ function receivedMessage(event, req) {
             //Potentiellement les coordonées de l'utilisateur via Messenger
 
             console.log("Type : attachment");
-            console.log(message);
+            
+            if(message.attachments[0].type === "location") {
+                var loc = message.attachments[0].payload.coordinates;
+                userLocation(senderID, loc.lat, loc.long);
+                shopInfo(senderID);
+            }
+            
             // genTextMessage(senderID, "Message with attachment received");
         }
 
@@ -142,7 +152,7 @@ function receivedMessage(event, req) {
 
         if(shopPB.test(postback.payload)) {
             console.log("postback shop");
-            shopInfo(senderId);
+            shopInfo(senderID);
 
         } else if(detailPB.test(postback.payload)) {
             console.log("postback detail");
@@ -163,19 +173,35 @@ function receivedMessage(event, req) {
     }
 
     function shopInfo(userId) {
-
-        if(users[userId].location) {
-            api.nearby(users[userId].location, (nearPlaces)=>{
+        console.log("shop info "+userId);
+        if(users[userId]) {
+            console.log(users[userId]);
+            api.nearby(users[userId], (nearPlaces)=>{
                 displayPlaces = [];
-                for(var i=0; i<4;i++){
-                    var phUrl = api.getPlacePhoto(nearPlaces[i].photos[0].photo_reference);
-                    displayPlaces.push(new places.Place(nearPlaces[i].place_id, nearPlaces[i].name, nearPlaces[i].geometry.location.lat, nearPlaces[i].geometry.location.lng, nearPlaces[i].vicinity, nearPlaces[i].opening_hours.open_now, phUrl));
+                var max = Math.min(4,nearPlaces.length);
+                for(var i=0; i<max;i++){
+                    var phUrl = undefined;
+                    var open;
+                    if(nearPlaces[i].photos)
+                        phUrl = api.getPlacePhoto(nearPlaces[i].photos[0].photo_reference);
+                    if(nearPlaces[i].opening_hours)
+                        open = nearPlaces[i].opening_hours.open_now;
+                        
+                    displayPlaces.push(new places.Place(nearPlaces[i].place_id, nearPlaces[i].name, nearPlaces[i].geometry.location.lat, nearPlaces[i].geometry.location.lng, nearPlaces[i].vicinity, open, phUrl));
                 }
-                genPlacesListMessage(senderID, displayPlaces);
+                genPlacesListMessage(userId, displayPlaces);
             });
         } else {
-            genLocationMessage(senderID);
+            genLocationMessage(userId);
         }
+    }
+    
+    function userLocation(userId, lat, lng) {
+        if(!users[userId]) {
+            users[userId] = {};
+        }
+        users[userId].lat = lat;
+        users[userId].lng = lng;
     }
 }
 
