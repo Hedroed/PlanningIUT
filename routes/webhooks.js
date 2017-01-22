@@ -11,8 +11,10 @@ var API_KEY = "AIzaSyB_AjPMcqwoEZtcB_EJouqH0MJfFUg6vls";
 
 var param = {
     lat: 48.809362, //The Machinery location
-    lng: 2.365064  
+    lng: 2.365064
 };
+
+var users = {};
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -103,8 +105,7 @@ function receivedMessage(event, req) {
                 });
             } else if(shopRG.test(messageText)) {
                 // genTextMessage(senderID, "Pas ci vite mon petit kinder");
-                shopInfo();
-                // genLocationMessage(senderID);
+                shopInfo(senderId);
 
             } else if(helpRG.test(messageText)) {
                 genQuickReplies(senderID, "Je peux vous montré les commerces proche de vous: ", ["Commerce"]);
@@ -116,7 +117,11 @@ function receivedMessage(event, req) {
                 var lat = ret[1];
                 var lng = ret[2];
                 console.log("New location %s, %s", lat, lng);
+                users[senderId].location.lat = +lat;
+                users[senderId].location.lng = +lng;
                 genTextMessage(senderID, "Vous êtes en "+lat+", "+lng);
+                shopInfo(senderId);
+
             } else {
                 genQuickReplies(senderID, "Qu'avez vous voulu dire ?", askList);
             }
@@ -137,7 +142,7 @@ function receivedMessage(event, req) {
 
         if(shopPB.test(postback.payload)) {
             console.log("postback shop");
-            shopInfo();
+            shopInfo(senderId);
 
         } else if(detailPB.test(postback.payload)) {
             console.log("postback detail");
@@ -157,17 +162,21 @@ function receivedMessage(event, req) {
         genQuickReplies(senderID, "Qu'avez vous voulu dire ?", askList);
     }
 
-    function shopInfo() {
-        api.nearby(param, (nearPlaces)=>{
-            displayPlaces = [];
-            for(var i=0; i<4;i++){
-                var phUrl = api.getPlacePhoto(nearPlaces[i].photos[0].photo_reference);
-                displayPlaces.push(new places.Place(nearPlaces[i].place_id, nearPlaces[i].name, nearPlaces[i].geometry.location.lat, nearPlaces[i].geometry.location.lng, nearPlaces[i].vicinity, nearPlaces[i].opening_hours.open_now, phUrl));
-            }
-            genPlacesListMessage(senderID, displayPlaces);
-        });
-    }
+    function shopInfo(userId) {
 
+        if(users[userId].location) {
+            api.nearby(users[userId].location, (nearPlaces)=>{
+                displayPlaces = [];
+                for(var i=0; i<4;i++){
+                    var phUrl = api.getPlacePhoto(nearPlaces[i].photos[0].photo_reference);
+                    displayPlaces.push(new places.Place(nearPlaces[i].place_id, nearPlaces[i].name, nearPlaces[i].geometry.location.lat, nearPlaces[i].geometry.location.lng, nearPlaces[i].vicinity, nearPlaces[i].opening_hours.open_now, phUrl));
+                }
+                genPlacesListMessage(senderID, displayPlaces);
+            });
+        } else {
+            genLocationMessage(senderID);
+        }
+    }
 }
 
 function genTextMessage(recipientId, messageText, cb) {
@@ -315,7 +324,7 @@ function genLocationMessage(recipientId, cb) {
             id: recipientId
         },
         message: {
-            text: "Donner votre position:",
+            text: "Il me faut votre localisation, vous pouvez aussi tapez directement vos coordonnées :",
             quick_replies: [
             {
                 content_type:"location"
