@@ -53,7 +53,7 @@ router.post('/', function (req, res) {
 });
 
 //Get regex param from config file "trigger.cf"
-var trigger = require('../trigger.cf');
+var trigger = require('../trigger.json');
 
 //Ask detection
 var helloRG = new RegExp(trigger.text.hello,"i");
@@ -101,6 +101,7 @@ function receivedMessage(event, req) {
 
             } else if(thankRG.test(messageText)) {
                 genTextMessage(senderID, "Se fut un plaisir de discuter avec vous");
+                genImageMessage(senderID, "https://scontent.xx.fbcdn.net/t39.1997-6/p100x100/851586_126361877548609_1351776047_n.png?_nc_ad=z-m");
 
             } else if(locationRG.test(messageText)) {
                 //Récuperation des coordonnées en mode text
@@ -108,10 +109,12 @@ function receivedMessage(event, req) {
                 var lat = ret[1];
                 var lng = ret[2];
                 console.log("New location %s, %s", lat, lng);
-                userLocation(senderID, lat, lng);
-                console.log(users[senderID]);
-                genTextMessage(senderID, "Vous êtes en "+lat+", "+lng);
-                shopInfo(senderID);
+                if(userLocation(senderID, lat, lng)) {
+                    genTextMessage(senderID, "Vous êtes en "+lat+", "+lng);
+                    shopInfo(senderID);
+                } else {
+                    genTextMessage(senderID, "Coordonnées incorrect");
+                }
 
             } else if(newLocationRG.test(messageText)) {
                 //Demande de localisation
@@ -119,28 +122,36 @@ function receivedMessage(event, req) {
             } else if(searchRG.test(messageText)) {
 
                 var query = searchRG.exec(messageText)[1];
-                console.log(query);
-                genTypingOn(senderID); //Indique que la réponse en cour de traitement
 
-                //Recherche du lieu avec google places api
-                api.text(query, (resPlaces)=>{
+                if(query) {
+                    genTypingOn(senderID); //Indique que la réponse en cour de traitement
 
-                    if(resPlaces.length <= 0) {
-                        genTextMessage("Aucun résultat !");
-                    } else {
-                        displayPlaces = [];
-                        var max = Math.min(4,resPlaces.length);
-                        for(var i=0; i<max;i++){
-                            var phUrl = undefined;
-                            var open;
-                            if(resPlaces[i].photos) phUrl = api.getPlacePhoto(resPlaces[i].photos[0].photo_reference);
-                            if(resPlaces[i].opening_hours) open = resPlaces[i].opening_hours.open_now;
+                    //Recherche du lieu avec google places api
+                    api.text(query, (resPlaces)=>{
+                        //console.log("place récuperer "+resPlaces.length);
+                        if(resPlaces.length <= 0) {
+                            genTextMessage(senderID, "Aucun résultat !");
+                        } else if(resPlaces.length == 1){
+                            api.getPlaceInfos(resPlaces[0].place_id, (placeDetail)=>{
+                                genPlaceMessage(senderID, placeDetail, users[senderID]);
+                            });
+                        } else {
+                            displayPlaces = [];
+                            var max = Math.min(4,resPlaces.length);
+                            for(var i=0; i<max;i++){
+                                var phUrl = undefined;
+                                var open;
+                                if(resPlaces[i].photos) phUrl = api.getPlacePhoto(resPlaces[i].photos[0].photo_reference);
+                                if(resPlaces[i].opening_hours) open = resPlaces[i].opening_hours.open_now;
 
-                            displayPlaces.push(new places.Place(resPlaces[i].place_id, resPlaces[i].name, resPlaces[i].geometry.location.lat, resPlaces[i].geometry.location.lng, resPlaces[i].vicinity, open, phUrl));
+                                displayPlaces.push(new places.Place(resPlaces[i].place_id, resPlaces[i].name, resPlaces[i].geometry.location.lat, resPlaces[i].geometry.location.lng, resPlaces[i].formatted_address, open, phUrl));
+                            }
+                            genPlacesListMessage(senderID, displayPlaces);
                         }
-                        genPlacesListMessage(userId, displayPlaces);
-                    }
-                });
+                    });
+                } else {
+                    genTextMessage(senderID, "Pour faire une recherche tapez \"recherche\" + le nom du lieu");
+                }
 
             } else {
                 genQuickReplies(senderID, "Qu'avez vous voulu dire ?", askList);
@@ -155,6 +166,8 @@ function receivedMessage(event, req) {
                 var loc = message.attachments[0].payload.coordinates;
                 userLocation(senderID, loc.lat, loc.long);
                 shopInfo(senderID);
+            } else {
+                console.log(message.attachments[0]);
             }
 
         }
@@ -170,8 +183,8 @@ function receivedMessage(event, req) {
         } else if(detailPB.test(postback.payload)) {
             console.log("postback detail");
             var placeId = detailPB.exec(postback.payload)[1];
-            var placeDetail = api.getPlaceInfos(placeId, (placeDetail)=>{
-                genPlaceMessage(senderID, placeDetail, param);
+            api.getPlaceInfos(placeId, (placeDetail)=>{
+                genPlaceMessage(senderID, placeDetail, users[senderID]);
             });
 
         } else {
@@ -214,16 +227,21 @@ function receivedMessage(event, req) {
 
     //Enregistrement des coordonnées de l'utilisateur
     function userLocation(userId, lat, lng) {
+        lat = +lat;
+        lng = +lng;
+        if(lat > 90 || lat < -90 || lng > 180 || lng < -180) return false;
+
         if(!users[userId]) {
             users[userId] = {};
         }
-        users[userId].lat = lat;
-        users[userId].lng = lng;
+        users[userId].lat = +lat;
+        users[userId].lng = +lng;
 
         // Evite un trop plein du tableau d'utilisateur
         if(users.length > 50) {
             users.shift();
         }
+        return true;
     }
 }
 
@@ -278,18 +296,12 @@ function genPlacesListMessage(recipientId, places, cb) {
                     template_type: "list",
                     top_element_style: "compact",
                     elements: elems
-                    // ,
-                    // buttons: [
-                    //     {
-                    //         title: "View More",
-                    //         type: "postback",
-                    //         payload: "payload"
-                    //     }
-                    // ]
                 }
             }
         }
     };
+
+    console.dir(messageData.message.attachment.payload);
 
     callSendAPI(messageData, cb);
 }
@@ -307,11 +319,19 @@ function genPlaceMessage(recipientId, place, userLocation, cb) {
         });
     }
     if(place.mapUrl) {
-        buttons.push({
-            type: "web_url",
-            url: place.mapUrl,
-            title: "Distance:"+place.distance(userLocation.lat, userLocation.lng)+"m"
-        });
+        if(userLocation) {
+            buttons.push({
+                type: "web_url",
+                url: place.mapUrl,
+                title: "Distance:"+place.distance(userLocation.lat, userLocation.lng)+"m"
+            });
+        } else {
+            buttons.push({
+                type: "web_url",
+                url: place.mapUrl,
+                title: "Voir sur Map"
+            });
+        }
     }
     if(place.phone) {
         buttons.push({
@@ -442,6 +462,7 @@ function callSendAPI(messageData, cb) {
     } else {
       console.error("Unable to send message.");
       console.error(response);
+    //   console.error(response.request.url);
       console.error(error);
     }
   });
