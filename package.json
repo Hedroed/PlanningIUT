@@ -6,6 +6,7 @@
     "start": "nodemon ./bin/www"
   },
   "dependencies": {
+    "autoprefixer": "^6.7.2",
     "body-parser": "~1.15.2",
     "cookie-parser": "~1.4.3",
     "debug": "~2.2.0",
@@ -15,6 +16,7 @@
     "moment": "^2.17.1",
     "morgan": "~1.7.0",
     "node-sass-middleware": "0.9.8",
+    "postcss-middleware": "^1.1.3",
     "request": "^2.79.0",
     "serve-favicon": "~2.3.0",
     "xmlreader": "^0.2.3"

@@ -5,6 +5,8 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var fs = require('fs');
+var postcssMiddleware = require('postcss-middleware');
+var autoprefixer = require('autoprefixer');
 
 var index = require('./routes/index');
 var webhooks = require('./routes/webhooks');
@@ -27,6 +29,15 @@ app.use(require('node-sass-middleware')({
   indentedSyntax: true,
   sourceMap: true
 }));
+app.use('/stylesheets', postcssMiddleware({
+    src: function(req) {
+      return path.join(__dirname, 'public', 'stylesheets', req.path);
+    },
+    plugins: [
+      autoprefixer()
+    ]
+  }
+));
 app.use(express.static(path.join(__dirname, 'public')));
 
 //My middleware planning
