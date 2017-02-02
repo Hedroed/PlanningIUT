@@ -184,7 +184,12 @@ Place.prototype.distance = function (latitude, longitude) {
     var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 
     var d = Math.floor(R * c * 100)/100;
-    return d;
+
+    if( d/1000 > 1 ) {
+        return (Math.floor(d/10)/100)+"km";
+    } else {
+        return d+"m";
+    }
 };
 
 module.exports = {Place: Place, PlacesApi: PlacesApi};

@@ -8,9 +8,10 @@ var places = require('../places');
 //api key
 var MESSENGER_API_KEY = "EAAFq1GqUrIEBAELUVuua4YsHKChnbFZBip0ZAPIJbEh9bOIalrXqjVDib9YGvDg7h36VQfopGRswSoCDabRa6QCE0XoGZADfDjwOojwptzSyK4Y9OFmWGuMl2btW8ZBZAW6hj5UGz1QZBMK6TOpVYebFH2LIPX3EdOj5afYKicTAZDZD";
 var GOOGLE_API_KEY = "AIzaSyB_AjPMcqwoEZtcB_EJouqH0MJfFUg6vls";
+var MESSENGER_API_KEY_2 = "EAAFq1GqUrIEBAMKYZCIZBoojZCVQ4yprnH98Bpml8wYbmsQmSzXuGCjbmiNY0BNVuTBLz4HaQide8mBD7gGUZAysweVY6G0GlItcM4ZBKncfPGMDspDtbiuI3WDDXcOmlp961GfCmEBAPjZAWYL632Yzq5xP7QadZCmZCcsSfFQsuwZDZD";
 
 // constante
-var askList = ["Bonjour", "Commerce", "Merci", "Aide", "Localisation"];
+var askList = ["Recherche", "Commerce", "Localisation", "Aide", "Merci", "Bonjour"];
 var api = new places.PlacesApi(GOOGLE_API_KEY);
 var users = {};
 
@@ -72,6 +73,8 @@ function receivedMessage(event, req) {
     var senderID = event.sender.id;
     var timeOfMessage = event.timestamp;
     console.log("Received for user %d at %s", senderID, moment(+timeOfMessage).format('lll'));
+    console.log(event.recipient.id);
+    var fbKey = event.recipient.id === "1765095850483565" ? MESSENGER_API_KEY_2 : MESSENGER_API_KEY;
 
     if(event.message) {
         var message = event.message;
@@ -84,11 +87,11 @@ function receivedMessage(event, req) {
 
             // reconnaissance du texte du message avec des expressions régiliéres
             if(helloRG.test(messageText)) {
-                getUserInfo(senderID, (user)=>{
+                getUserInfo(senderID, fbKey, (user)=>{
                     console.log("send greeting");
                     var title = (user.gender === "male" ? "Mr":"Mme");
-                    genTextMessage(senderID, "Bonjour "+title+" "+user.first_name+" "+user.last_name, ()=>{
-                        genQuickReplies(senderID, "Demandez moi quelque chose:", askList);
+                    genTextMessage(senderID, "Bonjour "+title+" "+user.first_name+" "+user.last_name, fbKey, ()=>{
+                        genQuickReplies(senderID, "Demandez moi quelque chose :", askList, fbKey);
                     });
                 });
 
@@ -97,11 +100,11 @@ function receivedMessage(event, req) {
                 shopInfo(senderID);
 
             } else if(helpRG.test(messageText)) {
-                genQuickReplies(senderID, "Je peux vous montré les commerces proche de vous. Vous pouvez également recherchez des lieu en envoyant \"recherche\" + le nom du lieu", ["Commerce","Localisation"]);
+                genQuickReplies(senderID, "Je peux vous montrer les commerces proches de vous. Vous pouvez également rechercher des lieux en envoyant \"recherche\" + le nom du lieu", ["Commerce", "Recherche", "Localisation"], fbKey);
 
             } else if(thankRG.test(messageText)) {
-                genTextMessage(senderID, "Se fut un plaisir de discuter avec vous");
-                genImageMessage(senderID, "https://scontent.xx.fbcdn.net/t39.1997-6/p100x100/851586_126361877548609_1351776047_n.png?_nc_ad=z-m");
+                genTextMessage(senderID, "Ce fut un plaisir de discuter avec vous", fbKey);
+                genImageMessage(senderID, "https://scontent.xx.fbcdn.net/t39.1997-6/p100x100/851586_126361877548609_1351776047_n.png?_nc_ad=z-m", fbKey);
 
             } else if(locationRG.test(messageText)) {
                 //Récuperation des coordonnées en mode text
@@ -110,30 +113,31 @@ function receivedMessage(event, req) {
                 var lng = ret[2];
                 console.log("New location %s, %s", lat, lng);
                 if(userLocation(senderID, lat, lng)) {
-                    genTextMessage(senderID, "Vous êtes en "+lat+", "+lng);
+                    genTextMessage(senderID, "Vous êtes en "+lat+", "+lng, fbKey);
                     shopInfo(senderID);
                 } else {
-                    genTextMessage(senderID, "Coordonnées incorrect");
+                    genTextMessage(senderID, "Coordonnées incorrect", fbKey);
                 }
 
             } else if(newLocationRG.test(messageText)) {
                 //Demande de localisation
-                genLocationMessage(senderID);
+                genLocationMessage(senderID, fbKey);
             } else if(searchRG.test(messageText)) {
 
                 var query = searchRG.exec(messageText)[1];
 
                 if(query) {
-                    genTypingOn(senderID); //Indique que la réponse en cour de traitement
+                    genTypingOn(senderID, fbKey); //Indique que la réponse en cour de traitement
 
                     //Recherche du lieu avec google places api
                     api.text(query, (resPlaces)=>{
                         //console.log("place récuperer "+resPlaces.length);
                         if(resPlaces.length <= 0) {
-                            genTextMessage(senderID, "Aucun résultat !");
+                            genTextMessage(senderID, "Aucun résultat !", fbKey);
                         } else if(resPlaces.length == 1){
+                            //S'il n'y a qu'un resultat on affiche directement les information détaillées
                             api.getPlaceInfos(resPlaces[0].place_id, (placeDetail)=>{
-                                genPlaceMessage(senderID, placeDetail, users[senderID]);
+                                genPlaceMessage(senderID, placeDetail, users[senderID], fbKey);
                             });
                         } else {
                             displayPlaces = [];
@@ -146,15 +150,15 @@ function receivedMessage(event, req) {
 
                                 displayPlaces.push(new places.Place(resPlaces[i].place_id, resPlaces[i].name, resPlaces[i].geometry.location.lat, resPlaces[i].geometry.location.lng, resPlaces[i].formatted_address, open, phUrl));
                             }
-                            genPlacesListMessage(senderID, displayPlaces);
+                            genPlacesListMessage(senderID, displayPlaces, fbKey);
                         }
                     });
                 } else {
-                    genTextMessage(senderID, "Pour faire une recherche tapez \"recherche\" + le nom du lieu");
+                    genTextMessage(senderID, "Pour faire une recherche tapez \"recherche\" + le nom du lieu", fbKey);
                 }
 
             } else {
-                genQuickReplies(senderID, "Qu'avez vous voulu dire ?", askList);
+                genQuickReplies(senderID, "Qu'avez vous voulu dire ?", askList, fbKey);
 
             }
 
@@ -184,44 +188,53 @@ function receivedMessage(event, req) {
             console.log("postback detail");
             var placeId = detailPB.exec(postback.payload)[1];
             api.getPlaceInfos(placeId, (placeDetail)=>{
-                genPlaceMessage(senderID, placeDetail, users[senderID]);
+                genPlaceMessage(senderID, placeDetail, users[senderID], fbKey);
             });
 
         } else {
-            genQuickReplies(senderID, "Qu'avez vous voulu dire ?", askList);
+            genQuickReplies(senderID, "Qu'avez vous voulu dire ?", askList, fbKey);
 
         }
     } else {
         //message inconnu, proposition des message pertinents
         console.log("quick replies");
-        genQuickReplies(senderID, "Qu'avez vous voulu dire ?", askList);
+        genQuickReplies(senderID, "Qu'avez vous voulu dire ?", askList, fbKey);
     }
 
     //Vérifie s'il on connait les coordonnées de l'utilisateur
     //Cherche les magasins à proximité
     function shopInfo(userId) {
-        console.log("shop info "+userId);
         if(users[userId]) {
-            genTypingOn(senderID); //Indique que la réponse en cour de traitement
+            genTypingOn(senderID, fbKey); //Indique que la réponse en cour de traitement
             //On connait les coordonnées et on récupere les lieux autours de ces coordonnées dans un rayon de 500m
             api.nearby(users[userId], (nearPlaces)=>{
-                displayPlaces = [];
-                var max = Math.min(4,nearPlaces.length);
-                for(var i=0; i<max;i++){
-                    var phUrl = undefined;
-                    var open;
-                    if(nearPlaces[i].photos)
-                        phUrl = api.getPlacePhoto(nearPlaces[i].photos[0].photo_reference);
-                    if(nearPlaces[i].opening_hours)
-                        open = nearPlaces[i].opening_hours.open_now;
 
-                    displayPlaces.push(new places.Place(nearPlaces[i].place_id, nearPlaces[i].name, nearPlaces[i].geometry.location.lat, nearPlaces[i].geometry.location.lng, nearPlaces[i].vicinity, open, phUrl));
+                if(nearPlaces.length <= 0) {
+                    genTextMessage(senderID, "Aucun résultat !", fbKey);
+                } else if(nearPlaces.length == 1){
+                    //S'il n'y a qu'un resultat on affiche directement les information détaillées
+                    api.getPlaceInfos(nearPlaces[0].place_id, (placeDetail)=>{
+                        genPlaceMessage(senderID, placeDetail, users[senderID], fbKey);
+                    });
+                } else {
+                    displayPlaces = [];
+                    var max = Math.min(4,nearPlaces.length);
+                    for(var i=0; i<max;i++){
+                        var phUrl = undefined;
+                        var open;
+                        if(nearPlaces[i].photos)
+                            phUrl = api.getPlacePhoto(nearPlaces[i].photos[0].photo_reference);
+                        if(nearPlaces[i].opening_hours)
+                            open = nearPlaces[i].opening_hours.open_now;
+
+                        displayPlaces.push(new places.Place(nearPlaces[i].place_id, nearPlaces[i].name, nearPlaces[i].geometry.location.lat, nearPlaces[i].geometry.location.lng, nearPlaces[i].vicinity, open, phUrl));
+                    }
+                    genPlacesListMessage(userId, displayPlaces, fbKey);
                 }
-                genPlacesListMessage(userId, displayPlaces);
             });
         } else {
             // Demande de coordonnées
-            genLocationMessage(userId);
+            genLocationMessage(userId, fbKey);
         }
     }
 
@@ -246,7 +259,7 @@ function receivedMessage(event, req) {
 }
 
 //Envoi un message text
-function genTextMessage(recipientId, messageText, cb) {
+function genTextMessage(recipientId, messageText, key, cb) {
     var messageData = {
         recipient: {
             id: recipientId
@@ -256,11 +269,11 @@ function genTextMessage(recipientId, messageText, cb) {
         }
     };
 
-    callSendAPI(messageData, cb);
+    callSendAPI(messageData, key, cb);
 }
 
 //Envoi un template de liste de places
-function genPlacesListMessage(recipientId, places, cb) {
+function genPlacesListMessage(recipientId, places, key, cb) {
     if(places.length > 4) throw "Too many places max is 4";
 
     var elems = [];
@@ -300,14 +313,13 @@ function genPlacesListMessage(recipientId, places, cb) {
             }
         }
     };
+    //console.dir(messageData.message.attachment.payload);
 
-    console.dir(messageData.message.attachment.payload);
-
-    callSendAPI(messageData, cb);
+    callSendAPI(messageData, key, cb);
 }
 
 //Envoi un template de place détaillé
-function genPlaceMessage(recipientId, place, userLocation, cb) {
+function genPlaceMessage(recipientId, place, userLocation, key, cb) {
     var openState = place.openNow ? "Actuellement ouvert" : "Fermer";
 
     var buttons = [];
@@ -323,7 +335,7 @@ function genPlaceMessage(recipientId, place, userLocation, cb) {
             buttons.push({
                 type: "web_url",
                 url: place.mapUrl,
-                title: "Distance:"+place.distance(userLocation.lat, userLocation.lng)+"m"
+                title: "Distance : "+place.distance(userLocation.lat, userLocation.lng)
             });
         } else {
             buttons.push({
@@ -369,11 +381,11 @@ function genPlaceMessage(recipientId, place, userLocation, cb) {
             }
         }
     };
-    callSendAPI(messageData, cb);
+    callSendAPI(messageData, key, cb);
 }
 
 //Envoi une image
-function genImageMessage(recipientId, imageUrl, cb) {
+function genImageMessage(recipientId, imageUrl, key, cb) {
     var messageData = {
         recipient: {
             id: recipientId
@@ -387,11 +399,11 @@ function genImageMessage(recipientId, imageUrl, cb) {
             }
         }
     };
-    callSendAPI(messageData, cb);
+    callSendAPI(messageData, key, cb);
 }
 
 //Envoi une demande de localisation
-function genLocationMessage(recipientId, cb) {
+function genLocationMessage(recipientId, key, cb) {
     var messageData = {
         recipient: {
             id: recipientId
@@ -404,11 +416,11 @@ function genLocationMessage(recipientId, cb) {
             }]
         }
     };
-    callSendAPI(messageData, cb);
+    callSendAPI(messageData, key, cb);
 }
 
 //Envoi des reponses rapides
-function genQuickReplies(recipientId, title, texts, cb) {
+function genQuickReplies(recipientId, title, texts, key, cb) {
     var replies = [];
     for(text of texts) {
         replies.push({
@@ -428,11 +440,11 @@ function genQuickReplies(recipientId, title, texts, cb) {
         }
     };
 
-    callSendAPI(messageData, cb);
+    callSendAPI(messageData, key, cb);
 }
 
 //Envoi l'evenement "En train d'écrire"
-function genTypingOn(recipientId) {
+function genTypingOn(recipientId, key) {
     var messageData = {
         recipient: {
             id: recipientId
@@ -440,14 +452,14 @@ function genTypingOn(recipientId) {
         sender_action: "typing_on"
     };
 
-    callSendAPI(messageData);
+    callSendAPI(messageData, key);
 }
 
 //Appele à l'API Messenger d'envoi de message
-function callSendAPI(messageData, cb) {
+function callSendAPI(messageData, key, cb) {
   request({
     uri: 'https://graph.facebook.com/v2.6/me/messages',
-    qs: { access_token: MESSENGER_API_KEY },
+    qs: { access_token: key },
     method: 'POST',
     json: messageData
 
@@ -469,14 +481,14 @@ function callSendAPI(messageData, cb) {
 }
 
 //Récupere les information d'un utilisateur via son ID par l'API facebook
-function getUserInfo(userId, cb) {
+function getUserInfo(userId, key, cb) {
     if(!cb) throw "no callback";
 
     request({
         uri: 'https://graph.facebook.com/v2.6/'+userId,
         qs: {
             fields: "first_name,last_name,profile_pic,gender,locale",
-            access_token: MESSENGER_API_KEY
+            access_token: key
         },
         method: 'GET'
     }, function(error, response, body) {
