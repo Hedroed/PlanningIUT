@@ -42,8 +42,14 @@
                              }
                         }
                         lastDate = courses[i].start.getDate();
+						
+						var colorClass = "";
+						if(/TDI|TDi|Tp|TP/.test(courses[i].name)) colorClass="tp";
+						else if(/TD|Td/.test(courses[i].name)) colorClass="td";
+						else if(/CM/.test(courses[i].name)) colorClass="cm";
+						else if(/PPP|Projet|projet|ppp/.test(courses[i].name)) colorClass="ppp";
                 %>
-                <div class="course">
+                <div class="course<%= " "+colorClass %>">
                     <h2><%= courses[i].name %></h1>
 
                     <div>
