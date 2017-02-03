@@ -29,7 +29,7 @@ router.get('/', function(req, res, next) {
     //get unused room
     var rooms = req.unusedRoom.sallesDisponibles(Date.now()+1000*60*15); //maintenant plus 15 minutes
 
-    var renderParam = { moment: moment, title: 'Planning '+param, courses: courses, options: {deps: deps, INFO1: groupsInfo1, INFO2: groupsInfo2}, selectedDep: "INFO"+paramInfo, selectedGroup: param, unused: rooms };
+    var renderParam = { moment: moment, title: 'Planning '+param, courses: courses, options: {deps: deps, INFO1: groupsInfo1, INFO2: groupsInfo2}, selectedDep: "INFO"+paramInfo, selectedGroup: param, unused: rooms, menu: req.query.menu};
     res.render('index', renderParam);
 });
 

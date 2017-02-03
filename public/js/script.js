@@ -46,6 +46,26 @@ $(function(){
     });
 
     var checkbox = $('#side-checkbox');
+
+    $('#reload-icon').click(function(e){
+        var url = window.location.href;
+        var paramIndex = url.indexOf("menu=1");
+        console.log(paramIndex);
+        if(checkbox.prop('checked') && paramIndex === -1) {
+                if (url.indexOf('?') > -1)
+                    url += '&menu=1'
+                else
+                    url += '?menu=1'
+            window.location.href = url;
+        } else if(paramIndex > -1){
+            var url = window.location.href;
+            url = url.substring(0,paramIndex-1);
+            window.location.href = url;
+        } else {
+            window.location.reload(false);
+        }
+    });
+
     $('.page').swipe({
         swipe: function(event, direction, distance) {
             if(direction === "right")

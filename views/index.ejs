@@ -11,13 +11,13 @@
 	<link href="https://fonts.googleapis.com/css?family=Chela+One" rel="stylesheet">
   </head>
   <body>
-    <input type="checkbox" id="side-checkbox"></input>
+    <input type="checkbox" id="side-checkbox" <%= menu?"checked":"" %>></input>
 
     <div class="page">
         <label class="icon" id="side-icon" for="side-checkbox">
             <i class="fa fa-bars"></i>
         </label>
-        <span onclick='window.location.reload(false)' id="reload-icon" class="icon">
+        <span id="reload-icon" class="icon">
             <i class="fa fa-repeat"></i>
         </span>
         <span id="scroll-text">Scroll top </span>
