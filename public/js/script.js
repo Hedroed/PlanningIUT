@@ -75,6 +75,7 @@ $(function(){
 
             //console.log("Swipe "+direction);
         },
+        allowPageScroll: "vertical",
         threshold: 70
     });
 
