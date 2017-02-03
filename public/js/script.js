@@ -45,5 +45,17 @@ $(function(){
         }
     });
 
+    var checkbox = $('#side-checkbox');
+    $('.page').swipe({
+        swipe: function(event, direction, distance) {
+            if(direction === "right")
+                checkbox.prop('checked', true);
+            else
+                checkbox.prop('checked', false);
+
+            //console.log("Swipe "+direction);
+        },
+        threshold: 70
+    });
 
 });

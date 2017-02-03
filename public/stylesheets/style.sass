@@ -1,6 +1,13 @@
 $emerald: #20b390
 $emerald-light: #9ac1af
 
+$background: #e8e3e3
+
+$course-color-ppp: desaturate(#ffcccc, 30%)
+$course-color-td: desaturate(#ffff99, 30%)
+$course-color-tp: desaturate(#ccffcc, 30%)
+$course-color-cm: desaturate(#ccccff, 30%)
+
 $slide-duration: 0.5s
 
 *
@@ -13,7 +20,7 @@ body
   width: 100%
   height: 100vh
   overflow: hidden
-  background-color: #eee
+  background-color: $background
 
 .hide
     display: none
@@ -61,13 +68,13 @@ h1.title
             width: 100%
 
             &.cm
-                background-color: #ccccff
+                background-color: $course-color-cm
             &.tp
-                background-color: #ccffcc
+                background-color: $course-color-tp
             &.td
-                background-color: #ffff99
+                background-color: $course-color-td
             &.ppp
-                background-color: #ffcccc
+                background-color: $course-color-ppp
 
         h2
             margin-top: 0
@@ -218,7 +225,7 @@ h1.title
 
 #reload-icon
     font-size: 30px
-    z-index: 1
+    z-index: 5
     top: 38px
 
 #up-icon
