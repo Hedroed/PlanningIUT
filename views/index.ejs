@@ -67,7 +67,7 @@
         <div class="sideBar">
             <h1>Sélection groupe</h1>
             <form class="groupSelector" action="/" method="get">
-                <select class="select" id="selectDeps">
+                <select class="select noSwipe" id="selectDeps">
                     <%
                     for ( var i = 0; i < options.deps.length; i++ )
                     {
@@ -76,7 +76,7 @@
                     }
                     %>
                 </select>
-                <select name="group" class="select" id="selectGroup">
+                <select name="group" class="select noSwipe" id="selectGroup">
                     <%
                         for ( var j = 0; j < options.deps.length; j++ ) {
                             var dep = options.deps[ j ];

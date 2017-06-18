@@ -9,7 +9,6 @@ var postcssMiddleware = require('postcss-middleware');
 var autoprefixer = require('autoprefixer');
 
 var index = require('./routes/index');
-var webhooks = require('./routes/webhooks');
 
 var app = express();
 
@@ -73,32 +72,7 @@ app.use(function(req, res, next) {
     next();
 });
 
-var iPConnection = require('./ipInfo.json');
-setInterval(()=>{
-    fs.writeFile("ipInfo.json", JSON.stringify(iPConnection), function(err) {
-        if(err) {
-            return console.log(err);
-        } else {
-		console.log("Save ip");
-	}
-    });
-},60*60*1000); //1 heure
-var regexIP = /(1|2)?\d{1,2}\.(1|2)?\d{1,2}\.(1|2)?\d{1,2}\.(1|2)?\d{1,2}/;
-app.use(function(req, res, next) {
-    var tmp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    var ip = regexIP.exec(tmp);
-    if(ip != null) {
-	if(iPConnection[ip[0]]) {
-		iPConnection[ip[0]]++;
-	} else {
-		iPConnection[ip[0]]=1;
-	}
-    }
-    next();
-});
-
 app.use('/', index);
-app.use('/webhooks', webhooks);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
