@@ -1,9 +1,10 @@
 {
   "name": "planningiut",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "start": "nodemon ./bin/www",
+    "server": "node ./bin/www"
   },
   "dependencies": {
     "autoprefixer": "^6.7.2",
