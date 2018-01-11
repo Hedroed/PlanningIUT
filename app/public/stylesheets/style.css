@@ -1,0 +1,250 @@
+* {
+  box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #e8e3e3; }
+
+.hide {
+  display: none; }
+
+a {
+  color: #00B7FF; }
+
+.page {
+  height: 100vh;
+  overflow: hidden; }
+
+h1 {
+  text-shadow: #18886d 0px 1px 0px, #177f66 0px 2px 0px, #15765f 0px 3px 0px, #146e58 0px 4px 0px;
+  color: #20b390;
+  font-family: 'Chela One', cursive; }
+
+h1.title {
+  text-align: right;
+  margin: 10px;
+  font-size: 30px;
+  width: 90%;
+  transition: ease-in-out 0.5s; }
+
+/* Courses */
+.courses {
+  z-index: 0;
+  padding-left: 50px;
+  transition: ease-in-out 0.5s;
+  width: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: 100%; }
+  .courses section {
+    width: 100%; }
+    .courses section .course {
+      height: 90px;
+      background-color: #ddd;
+      margin: 10px 0px;
+      padding: 5px 10px;
+      box-shadow: 0px 3px 5px #ddd;
+      border-top-left-radius: 5px;
+      border-bottom-left-radius: 5px;
+      width: 100%; }
+      .courses section .course.cm {
+        background-color: #d4d4f7; }
+      .courses section .course.tp {
+        background-color: #d4f7d4; }
+      .courses section .course.td {
+        background-color: #f0f0a8; }
+      .courses section .course.ppp {
+        background-color: #f7d4d4; }
+    .courses section h2 {
+      margin-top: 0;
+      margin-bottom: 5px;
+      overflow: hidden;
+      font-size: 20px;
+      max-height: 34px;
+      font-family: "Century Gothic", Helvetica; }
+      @media screen and (min-width: 501px) and (max-width: 700px) {
+        .courses section h2 {
+          font-size: 16px; } }
+      @media screen and (min-width: 301px) and (max-width: 500px) {
+        .courses section h2 {
+          font-size: 13px;
+          max-height: 38px;
+          margin-bottom: 0; } }
+      @media screen and (max-width: 300px) {
+        .courses section h2 {
+          font-size: 12px; } }
+    @media screen and (max-width: 500px) {
+      .courses section .course-text {
+        font-size: 13px; } }
+    .courses section .date {
+      display: inline-block; }
+    .courses section .line {
+      margin: 12px 5px;
+      margin-right: 50px;
+      border-top: 2px solid #9ac1af;
+      font-family: 'Chela One', cursive;
+      color: #9ac1af;
+      font-size: 18px; }
+      .courses section .line.bottom {
+        border-bottom: 2px solid #9ac1af; }
+
+/* Side bar*/
+.sideBar {
+  width: 320px;
+  height: 100vh;
+  z-index: 2;
+  position: fixed;
+  left: -320px;
+  top: 0px;
+  background-color: #222;
+  transition: ease-in-out 0.5s;
+  text-align: center;
+  /*form*/ }
+  .sideBar h1 {
+    margin-top: 30px;
+    margin-bottom: 4px; }
+    @media screen and (max-height: 650px) {
+      .sideBar h1 {
+        margin-top: 10px; } }
+  .sideBar form.groupSelector .select {
+    background-color: #20b390;
+    color: white;
+    outline: none;
+    border: 1px solid #20b390;
+    width: 200px;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: #18886d 0px 1px 0px, #177f66 0px 2px 0px, #15765f 0px 3px 0px, #146e58 0px 4px 0px; }
+  .sideBar form.groupSelector select {
+    margin: 20px 0px; }
+    @media screen and (max-height: 650px) {
+      .sideBar form.groupSelector select {
+        margin: 8px 0px; } }
+  .sideBar form.groupSelector input {
+    cursor: pointer;
+    margin: 8px 0px;
+    border: 1px solid #20b390;
+    transition: ease 0.5s; }
+  .sideBar form.groupSelector #pop-up {
+    opacity: 0;
+    display: inline-block;
+    transition: opacity 0.2s ease; }
+    .sideBar form.groupSelector #pop-up p {
+      width: 230px;
+      border-radius: 3px;
+      background-color: #9ac1af;
+      color: white;
+      font-family: "Century Gothic", Helvetica;
+      margin: 0; }
+    .sideBar form.groupSelector #pop-up.active {
+      opacity: 1; }
+  .sideBar .unused {
+    font-family: "Century Gothic", Helvetica;
+    color: white;
+    text-align: center; }
+    .sideBar .unused h1 {
+      margin-top: 5px; }
+    .sideBar .unused ul {
+      list-style-type: none;
+      display: inline-block;
+      width: 150px;
+      padding: 0;
+      margin: 12px; }
+      @media screen and (max-height: 650px) {
+        .sideBar .unused ul {
+          margin: 0; } }
+      @media screen and (max-height: 540px) {
+        .sideBar .unused ul {
+          width: 250px; } }
+    .sideBar .unused li {
+      display: inline-block;
+      padding: 5px 7px;
+      font-size: 18px; }
+  .sideBar footer {
+    height: 30px;
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    background-color: #151515;
+    color: #a5a5a5;
+    font-size: 11px;
+    padding-top: 6px; }
+
+.icon {
+  transition: ease-in-out 0.5s;
+  height: 38px;
+  width: 38px;
+  text-align: center;
+  left: 6px;
+  position: fixed;
+  cursor: pointer; }
+
+#side-icon {
+  z-index: 3;
+  top: 4px;
+  font-size: 30px; }
+
+#reload-icon {
+  font-size: 30px;
+  z-index: 5;
+  top: 38px; }
+
+#up-icon {
+  z-index: 4;
+  bottom: 38px;
+  font-size: 38px; }
+  #up-icon i {
+    position: relative;
+    bottom: 3px; }
+  #up-icon #bg-scroll {
+    height: 100%;
+    width: 100%;
+    transform: scale(0);
+    border-radius: 50%;
+    background-color: #9ac1af;
+    position: absolute;
+    transition: ease-in-out 0.5s; }
+    #up-icon #bg-scroll.active {
+      transform: scale(1); }
+
+#scroll-text {
+  z-index: 4;
+  position: fixed;
+  bottom: 46px;
+  left: -110px;
+  color: white;
+  font-size: 18px;
+  transition: ease-in-out 0.5s;
+  font-family: 'Chela One', cursive;
+  font-size: 20px; }
+
+#side-checkbox {
+  display: none; }
+  @media screen and (max-width: 550px) {
+    #side-checkbox:checked + .page .title {
+      transform: translateX(320px); } }
+  #side-checkbox:checked + .page .icon {
+    transform: translateX(278px);
+    color: white; }
+    @media screen and (max-width: 319px) {
+      #side-checkbox:checked + .page .icon {
+        transform: translateX(0px); } }
+  #side-checkbox:checked + .page #scroll-text {
+    transform: translateX(320px); }
+    @media screen and (max-width: 319px) {
+      #side-checkbox:checked + .page #scroll-text {
+        transform: translateX(155px); } }
+  #side-checkbox:checked + .page #bg-scroll {
+    transform: scale(0); }
+  #side-checkbox:checked + .page .courses {
+    transform: translateX(295px); }
+  #side-checkbox:checked + .page .sideBar {
+    transform: translateX(320px); }
+
+/*# sourceMappingURL=style.css.map */
