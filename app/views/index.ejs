@@ -31,17 +31,17 @@
             <section>
                 <%  var lastDate = 0;
                     for(var i=0; i<courses.length; i++) {
-                        var momentStart = moment(courses[i].start),
-                            momentEnd = moment(courses[i].end);
-                        if(courses[i].start.getDate() != lastDate) {
-                             if(courses[i].start.getDay() === 1) {
+                        var momentStart = courses[i].start,
+                            momentEnd = courses[i].end;
+                        if(courses[i].start.date() != lastDate) {
+                             if(courses[i].start.day() === 1) {
                                  %> <div class="line bottom"><%= momentStart.format("dddd D MMMM YYYY"); %></div> <%
                              }
                              else {
                                  %> <div class="line"><%= momentStart.format("dddd D MMMM YYYY"); %></div> <%
                              }
                         }
-                        lastDate = courses[i].start.getDate();
+                        lastDate = courses[i].start.date();
 
 						var colorClass = "";
 						if(/TDI|TDi|Tp|TP/.test(courses[i].name)) colorClass="tp";
@@ -53,7 +53,7 @@
                     <h2><%= courses[i].name %></h1>
 
                     <div>
-                        <div class="course-text date start"><%= momentStart.format("Do MMMM HH:mm"); %></div>
+                        <div class="course-text date start"><%= momentStart.format("Do MMMM HH:mm"); %> </div>
                         -
                         <div class=" course-text date end"><%= momentEnd.format("Do MMMM HH:mm"); %></div>
                     </div>
