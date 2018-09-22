@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  updater:
+    build: .
+    image: planningiut.fr:latest
+    ports:
+      - "127.0.0.1:3000:3000"
+    dns:
+      - 8.8.8.8
+      - 9.9.9.9
+      - 127.0.1.1
