@@ -1,5 +1,10 @@
 FROM node:carbon
 
+ENV TZ=Europe/Paris
+RUN rm /etc/localtime && \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    echo $TZ > /etc/timezone
+
 # Create app directory
 WORKDIR /usr/src/app
 
