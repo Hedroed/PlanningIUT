@@ -25,7 +25,8 @@ var getCalendar = function(idCalendar, callback){
 var parse = function(data,callback) {
     //parse line into date object
     function toDate(line) {
-        return new Date(Date.UTC(line.substring(0,4), +line.substring(4,6)-1, line.substring(6,8), line.substring(9,11), line.substring(11,13), line.substring(13,15)));
+        return moment(line);
+        // return new Date(Date.UTC(line.substring(0,4), +line.substring(4,6)-1, line.substring(6,8), line.substring(9,11), line.substring(11,13), line.substring(13,15)));
     }
 
     var json = [];
@@ -116,9 +117,9 @@ var parse = function(data,callback) {
     json.sort(function (a, b) {
         if(a.start == undefined || b.start == undefined) return -1;
 
-        if (a.start.getTime() > b.start.getTime())
+        if (a.start > b.start)
             return 1;
-        if (a.start.getTime() < b.start.getTime())
+        if (a.start < b.start)
             return -1;
         // a doit être égale à b
         return 0;
