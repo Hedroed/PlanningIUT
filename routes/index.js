@@ -14,7 +14,7 @@ router.get('/', function(req, res, next) {
     var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
     console.log(ip);
 
-    var param = req.query.group || req.cookies.group || "2C1";
+    var param = req.query.group || req.cookies.group || "1A2";
 
     var paramChecker = /^[1,2][A-D][1,2]$/;
     if(!paramChecker.test(param)) param = "2D1";
@@ -29,7 +29,7 @@ router.get('/', function(req, res, next) {
     //get unused room
     var rooms = req.unusedRoom.sallesDisponibles(Date.now()+1000*60*15); //maintenant plus 15 minutes
 
-    var renderParam = { moment: moment, title: 'Planning '+param, courses: courses, options: {deps: deps, INFO1: groupsInfo1, INFO2: groupsInfo2}, selectedDep: "INFO"+paramInfo, selectedGroup: param, unused: rooms, menu: req.query.menu};
+    var renderParam = { moment: moment, title: 'BDE@RootDuRhum - Planning '+param, courses: courses, options: {deps: deps, INFO1: groupsInfo1, INFO2: groupsInfo2}, selectedDep: "INFO"+paramInfo, selectedGroup: param, unused: rooms, menu: req.query.menu};
     res.render('index', renderParam);
 });
 
