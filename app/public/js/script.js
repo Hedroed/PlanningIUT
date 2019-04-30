@@ -79,4 +79,15 @@ $(function(){
         threshold: 70
     });
 
+    var timerId = countdown(
+        new Date(2020,5,1,0,0,0),
+        function(ts) {
+        document.getElementById('count').innerHTML = ts.toHTML("strong");
+        },
+        countdown.DEFAULT
+    );
+
+    // later on this timer may be stopped
+    // window.clearInterval(timerId);
+
 });

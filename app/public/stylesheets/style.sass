@@ -28,9 +28,25 @@ body
 a
   color: #00B7FF
 
+.banner
+    background-color: #e12
+    padding: 10px 10px 10px 50px
+    text-align: center
+    color: black
+    font-weight: 500
+
+    a
+        color: black
+        text-decoration: none
+        font-weight: bold
+
+        &:hover
+            text-decoration: underline
+
 .page
     height: 100vh
     overflow: hidden
+    position: relative
 
 h1
     text-shadow: darken( $emerald, 10% ) 0px 1px 0px
@@ -201,14 +217,15 @@ h1.title
             font-size: 18px
 
     footer
-        height: 30px
+        height: 25px
+        line-height: 25px
+        width: 100%
         position: absolute
         bottom: 0px
         left: 0px
         background-color: #151515
         color: #a5a5a5
         font-size: 11px
-        padding-top: 6px
 
 .icon
     transition: ease-in-out $slide-duration

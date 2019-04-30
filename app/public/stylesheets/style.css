@@ -16,19 +16,33 @@ body {
 a {
   color: #00B7FF; }
 
+.banner {
+  background-color: #e12;
+  padding: 10px 10px 10px 50px;
+  text-align: center;
+  color: black;
+  font-weight: 500; }
+  .banner a {
+    color: black;
+    text-decoration: none;
+    font-weight: bold; }
+    .banner a:hover {
+      text-decoration: underline; }
+
 .page {
   height: 100vh;
-  overflow: hidden; }
+  overflow: hidden;
+  position: relative; }
 
 h1 {
-  text-shadow: #18886d 0px 1px 0px, #177f66 0px 2px 0px, #15765f 0px 3px 0px, #146e58 0px 4px 0px;
+  text-shadow: #18886d 0px 1px 0px;
   color: #20b390;
   font-family: 'Chela One', cursive; }
 
 h1.title {
   text-align: right;
   margin: 10px;
-  font-size: 30px;
+  font-size: 35px;
   width: 90%;
   transition: ease-in-out 0.5s; }
 
@@ -167,14 +181,15 @@ h1.title {
       padding: 5px 7px;
       font-size: 18px; }
   .sideBar footer {
-    height: 30px;
+    height: 25px;
+    line-height: 25px;
+    width: 100%;
     position: absolute;
     bottom: 0px;
     left: 0px;
     background-color: #151515;
     color: #a5a5a5;
-    font-size: 11px;
-    padding-top: 6px; }
+    font-size: 11px; }
 
 .icon {
   transition: ease-in-out 0.5s;
