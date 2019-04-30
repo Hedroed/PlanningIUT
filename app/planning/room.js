@@ -24,7 +24,7 @@ class Calendar {
             path: '/jsp/custom/modules/plannings/anonymous_cal.jsp?data=' + idCalendar
         };
         // console.log(options);
-        https.request(options, function(res) {
+        var req = https.request(options, function(res) {
             res.setEncoding('utf8');
             var data = '';
             ///////////////////////
@@ -35,7 +35,12 @@ class Calendar {
             res.on('end', function(){
                 callback(data);
             });
-        }).end();
+        })
+        req.on('error', function(err) {
+            console.error("Http error:", err);
+            callback('')
+        });
+        req.end();
     }
 
     static updateCalendar(calendar){

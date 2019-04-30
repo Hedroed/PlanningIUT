@@ -7,7 +7,7 @@ var getCalendar = function(idCalendar, callback){
         host: 'planning.univ-ubs.fr',
         path: '/jsp/custom/modules/plannings/anonymous_cal.jsp?data=' + idCalendar
     };
-    https.request(options, function(res) {
+    var req = https.request(options, function(res) {
         res.setEncoding('utf8');
         var data = '';
         ///////////////////////
@@ -18,7 +18,12 @@ var getCalendar = function(idCalendar, callback){
         res.on('end', function(){
             parse(data,callback);
         });
-    }).end();
+    });
+    req.on('error', function(err) {
+        console.error("Http error:", err);
+        callback({courses : []})
+    });
+    req.end();
 }
 
 //Parse ics file format
